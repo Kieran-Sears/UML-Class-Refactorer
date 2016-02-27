@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Profile name="BookShop_profile" xmi:id="FVL.X0qGAqAABgPY_profile" xmi:version="2.1" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/2.0.0/UML" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1">
+	<packageImport xmi:id="FVL.X0qGAqAABgPY_profile_UMLMetaModel">
+		<importedPackage href="pathmap://UML_METAMODELS/UML.metamodel.uml#_0" xmi:type="uml:Model"/>
+	</packageImport>
+	<eAnnotations source="http://www.eclipse.org/uml2/2.0.0/UML" xmi:id="FVL.X0qGAqAABgPY_profile_definition">
+		<contents name="BookShop_profile" nsPrefix="BookShop_profile" nsURI="http:///schemas/BookShop_profile/0" xmi:id="FVL.X0qGAqAABgPY_content" xmi:type="ecore:EPackage">
+			<eClassifiers name="primitive" xmi:id="HKYPwMqGAqAABgXw_classifier" xmi:type="ecore:EClass">
+				<eAnnotations references="HKYPwMqGAqAABgXw" source="http://www.eclipse.org/uml2/2.0.0/UML" xmi:id="HKYPwMqGAqAABgXw_annotation"/>
+				<eStructuralFeatures lowerBound="1" name="base_Class" ordered="false" xmi:id="HKYPwMqGAqAABgXw_structuralFeature" xmi:type="ecore:EReference">
+					<eType href="http://www.eclipse.org/uml2/2.0.0/UML#//Class" xmi:type="ecore:EClass"/>
+				</eStructuralFeatures>
+			</eClassifiers>
+			<eClassifiers name="enumeration" xmi:id="KqYPwMqGAqAABgYZ_classifier" xmi:type="ecore:EClass">
+				<eAnnotations references="KqYPwMqGAqAABgYZ" source="http://www.eclipse.org/uml2/2.0.0/UML" xmi:id="KqYPwMqGAqAABgYZ_annotation"/>
+				<eStructuralFeatures lowerBound="1" name="base_Class" ordered="false" xmi:id="KqYPwMqGAqAABgYZ_structuralFeature" xmi:type="ecore:EReference">
+					<eType href="http://www.eclipse.org/uml2/2.0.0/UML#//Class" xmi:type="ecore:EClass"/>
+				</eStructuralFeatures>
+			</eClassifiers>
+			<eClassifiers name="use" xmi:id="DqYPwMqGAqAABgZB_classifier" xmi:type="ecore:EClass">
+				<eAnnotations references="DqYPwMqGAqAABgZB" source="http://www.eclipse.org/uml2/2.0.0/UML" xmi:id="DqYPwMqGAqAABgZB_annotation"/>
+				<eStructuralFeatures lowerBound="1" name="base_Usage" ordered="false" xmi:id="DqYPwMqGAqAABgZB_structuralFeature" xmi:type="ecore:EReference">
+					<eType href="http://www.eclipse.org/uml2/2.0.0/UML#//Usage" xmi:type="ecore:EClass"/>
+				</eStructuralFeatures>
+			</eClassifiers>
+		</contents>
+	</eAnnotations>
+	<packagedElement name="primitive" xmi:id="HKYPwMqGAqAABgXw" xmi:type="uml:Stereotype">
+		<ownedAttribute association="HKYPwMqGAqAABgXw_extension" name="base_Class" xmi:id="HKYPwMqGAqAABgXw_to">
+			<type href="pathmap://UML_METAMODELS/UML.metamodel.uml#Class" xmi:type="uml:Class"/>
+		</ownedAttribute>
+	</packagedElement>
+	<packagedElement memberEnd="HKYPwMqGAqAABgXw_from HKYPwMqGAqAABgXw_to" name="Class_primitive" xmi:id="HKYPwMqGAqAABgXw_extension" xmi:type="uml:Extension">
+		<ownedEnd aggregation="composite" association="HKYPwMqGAqAABgXw_extension" type="HKYPwMqGAqAABgXw" xmi:id="HKYPwMqGAqAABgXw_from" xmi:type="uml:ExtensionEnd"/>
+	</packagedElement>
+	<packagedElement name="enumeration" xmi:id="KqYPwMqGAqAABgYZ" xmi:type="uml:Stereotype">
+		<ownedAttribute association="KqYPwMqGAqAABgYZ_extension" name="base_Class" xmi:id="KqYPwMqGAqAABgYZ_to">
+			<type href="pathmap://UML_METAMODELS/UML.metamodel.uml#Class" xmi:type="uml:Class"/>
+		</ownedAttribute>
+	</packagedElement>
+	<packagedElement memberEnd="KqYPwMqGAqAABgYZ_from KqYPwMqGAqAABgYZ_to" name="Class_enumeration" xmi:id="KqYPwMqGAqAABgYZ_extension" xmi:type="uml:Extension">
+		<ownedEnd aggregation="composite" association="KqYPwMqGAqAABgYZ_extension" type="KqYPwMqGAqAABgYZ" xmi:id="KqYPwMqGAqAABgYZ_from" xmi:type="uml:ExtensionEnd"/>
+	</packagedElement>
+	<packagedElement name="use" xmi:id="DqYPwMqGAqAABgZB" xmi:type="uml:Stereotype">
+		<ownedAttribute association="DqYPwMqGAqAABgZB_extension" name="base_Usage" xmi:id="DqYPwMqGAqAABgZB_to">
+			<type href="pathmap://UML_METAMODELS/UML.metamodel.uml#Usage" xmi:type="uml:Class"/>
+		</ownedAttribute>
+	</packagedElement>
+	<packagedElement memberEnd="DqYPwMqGAqAABgZB_from DqYPwMqGAqAABgZB_to" name="Usage_use" xmi:id="DqYPwMqGAqAABgZB_extension" xmi:type="uml:Extension">
+		<ownedEnd aggregation="composite" association="DqYPwMqGAqAABgZB_extension" type="DqYPwMqGAqAABgZB" xmi:id="DqYPwMqGAqAABgZB_from" xmi:type="uml:ExtensionEnd"/>
+	</packagedElement>
+</uml:Profile>
