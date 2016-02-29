@@ -5,7 +5,7 @@
  */
 package Parser;
 
-import DataTypes.MetaModel;
+import Evolution.MetaModel;
 
 /**
  *

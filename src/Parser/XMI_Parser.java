@@ -5,7 +5,7 @@
  */
 package Parser;
 
-import DataTypes.MetaModel;
+import Evolution.MetaModel;
 import DataTypes.Class.Class;
 import DataTypes.Class.Parameter;
 import DataTypes.Class.Operation;

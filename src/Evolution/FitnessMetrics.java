@@ -5,18 +5,20 @@
  */
 package Evolution;
 
+import DataTypes.Class.Association;
 import DataTypes.Component;
 import DataTypes.Class.Class;
 import DataTypes.Class.Operation;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
  *
  * @author Kieran
  */
-public class Fitness {
+public class FitnessMetrics {
 
-    Genome chromosome;
+    Class classe;
     int LackOfCohesion;
     int DepthOfInheritanceTree;
     int CouplingBetweenObjectClasses;
@@ -25,16 +27,6 @@ public class Fitness {
     int WeightedMethodsPerClass;
     double distanceFromMainSequence;
 
-    public void updateFitnessValues(Genome chromosome) {
-        this.chromosome = chromosome;
-        this.LackOfCohesion = LackOfCohesion();
-        this.DepthOfInheritanceTree = DepthOfInheritanceTree();
-        this.CouplingBetweenObjectClasses = CouplingBetweenObjectClasses();
-        this.NumberOfChildren = NumberOfChildren();
-        this.ResponseForAClass = ResponseForAClass();
-        this.WeightedMethodsPerClass = WeightedMethodsPerClass();
-        //this.distanceFromMainSequence = distanceFromMainSequence();
-    }
 
     public int LackOfCohesion() {
         return 0;
@@ -56,8 +48,8 @@ public class Fitness {
         return 0;
     }
 
-    public int WeightedMethodsPerClass() {
-        Iterator<Component> iterator = chromosome.components.iterator();
+    public int WeightedMethodsPerClass(ArrayList<Component> components) {
+        Iterator<Component> iterator = components.iterator();
         int nrOfClasses = 0;
         int nrOfOperations = 0;
         while (iterator.hasNext()) {
@@ -67,9 +59,7 @@ public class Fitness {
             }
             if (next instanceof Operation) {
                 nrOfOperations++;
-            } else {
-                // System.out.println("Erm Mac, we got an unknown here");
-            }
+            } 
         }
         if (nrOfClasses == 0) {
             throw new IllegalArgumentException("Argument 'nrOfClasses' is 0");
@@ -79,13 +69,17 @@ public class Fitness {
         }
     }
 
-    public double distanceFromMainSequence() {
+    public void cohesionOfMethods(){
+ 
+    }
+    
+    public double distanceFromMainSequence(ArrayList<Component> components, DependencyMatrix dependencies) {
 
         int abstractClasses = 0;
         int efferentCoupling = 0;
         int afferentCoupling = 0;
         int totalClasses = 0;
-        Iterator<Component> iterator = chromosome.components.iterator();
+        Iterator<Component> iterator = components.iterator();
         while (iterator.hasNext()) {
             Object next = iterator.next();
             if (next instanceof Class) {
@@ -94,14 +88,14 @@ public class Fitness {
                 if (_class.getIsAbstract()) {
                     abstractClasses++;
                 }
-                Integer dependencyID = chromosome.dependencies.lookupTable.get(_class.getID());
-                int[] efferentArray = chromosome.dependencies.associationMatrix[dependencyID];
+                Integer dependencyID = dependencies.lookupTable.get(_class.getID());
+                int[] efferentArray = dependencies.associationMatrix[dependencyID];
                 for (int i = 0; i < efferentArray.length; i++) {
                     if (efferentArray[i] != 0) {
                         efferentCoupling++;
                     }
                 }
-                int[][] afferentArray = chromosome.dependencies.associationMatrix;
+                int[][] afferentArray = dependencies.associationMatrix;
                 for (int i = 0; i < afferentArray.length; i++) {
                     if (i != dependencyID) {
                         int[] afferentArray1 = afferentArray[i];

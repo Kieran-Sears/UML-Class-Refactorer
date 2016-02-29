@@ -11,4 +11,7 @@ package DesignPatterns;
  */
 public class AntiPatternAnalyser {
     
+    
+    // blob antipattern detected through large number of methods and attributes assigned to a single class
+    // indecated by fitness: 
 }

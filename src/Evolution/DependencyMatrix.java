@@ -26,6 +26,7 @@ public class DependencyMatrix {
 
     public DependencyMatrix(ArrayList<Component> components, ArrayList<Association> associations) {
 
+        // get number of classes for matrix
         ArrayList<Class> classes = new ArrayList();
         for (int i = 0; i < components.size(); i++) {
             if (components.get(i) instanceof Class) {
@@ -33,6 +34,7 @@ public class DependencyMatrix {
             }
         }
 
+        // initialise matrix and add associations
         this.associationMatrix = new int[classes.size()][classes.size()];
         int classCounter = 0;
         for (Class classe : classes) {
@@ -49,6 +51,7 @@ public class DependencyMatrix {
             addDependency(source.getType(), target.getType(), source.getAggregation());
         }
         
+        // add method dependencies
         DataTypes.Class.Class classee = null;
         for (Component component : components) {
             if (component instanceof DataTypes.Class.Class){

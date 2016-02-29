@@ -5,10 +5,22 @@
  */
 package umlrefactorer;
 
+import Evolution.MetaModel;
+
 /**
  *
  * @author Kieran
  */
 public class DesignPatternsController {
+    
+    
+    public void scanForPatterns(MetaModel model){
+    
+    }
+    
+    public void scanForAntiPatterns(MetaModel model){
+    
+    }
+    
     
 }

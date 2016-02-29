@@ -5,7 +5,7 @@
  */
 package umlrefactorer;
 
-import DataTypes.MetaModel;
+import Evolution.MetaModel;
 import Evolution.GeneticAlgorithm;
 
 /**
@@ -23,7 +23,7 @@ public class EvolutionController {
     
    public void evolvePopulation(int numOfGenerations){
        for (int i = 0; i < numOfGenerations; i++) {
-           GA.evolve();
+           GA.evolvePopulation();
            GA.outputResultsToConsole();
            // GA.returnResultsAsHashmap(); // TODO GUI
        }

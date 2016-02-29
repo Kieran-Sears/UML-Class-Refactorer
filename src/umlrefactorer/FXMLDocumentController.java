@@ -5,7 +5,7 @@
  */
 package umlrefactorer;
 
-import DataTypes.MetaModel;
+import Evolution.MetaModel;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -46,7 +46,8 @@ public class FXMLDocumentController implements Initializable {
         float mutRate = Float.parseFloat(mutationRate.getText());
         float crossRate = Float.parseFloat(crossoverRate.getText());
         int gens = Integer.parseInt(numOfGenerations.getText());
-        
+        patterns.scanForAntiPatterns(model);
+        patterns.scanForPatterns(model);
         evolution.initialiseGA(model, popSize, mutRate, crossRate);
         evolution.evolvePopulation(gens);
     }

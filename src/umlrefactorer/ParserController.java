@@ -5,7 +5,7 @@
  */
 package umlrefactorer;
 
-import DataTypes.MetaModel;
+import Evolution.MetaModel;
 import Parser.Parser;
 import Parser.XMI_Parser;
 import java.io.File;

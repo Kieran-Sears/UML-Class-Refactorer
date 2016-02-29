@@ -9,6 +9,6 @@ package DesignPatterns;
  *
  * @author Kieran
  */
-public class AntiPattern {
+public abstract class AntiPattern {
     
 }
