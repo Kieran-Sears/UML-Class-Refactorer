@@ -5,6 +5,10 @@
  */
 package umlrefactorer;
 
+
+import DesignPatterns.AntiPatternAnalyser;
+import DesignPatterns.Blob;
+import DesignPatterns.MutationHeuristic;
 import Evolution.MetaModel;
 
 /**
@@ -15,11 +19,13 @@ public class DesignPatternsController {
     
     
     public void scanForPatterns(MetaModel model){
-    
+    AntiPatternAnalyser APA = new Blob();
+        MutationHeuristic mutationHeuristic = APA.scanModel(model);
+        
     }
     
     public void scanForAntiPatterns(MetaModel model){
-    
+   
     }
     
     

@@ -73,7 +73,7 @@ public class FitnessMetrics {
  
     }
     
-    public double distanceFromMainSequence(ArrayList<Component> components, DependencyMatrix dependencies) {
+    public double distanceFromMainSequence(ArrayList<Component> components, RelationshipMatrix dependencies) {
 
         int abstractClasses = 0;
         int efferentCoupling = 0;

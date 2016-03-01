@@ -5,6 +5,7 @@
  */
 package Evolution;
 
+import DesignPatterns.MutationHeuristic;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -52,6 +53,13 @@ public class GeneticAlgorithm {
     // evolution operators
 
     private MetaModel mutate(MetaModel model) {
+        // default mutation
+        return model;
+    }
+    
+     private MetaModel mutate(MetaModel model, MutationHeuristic heuristic) {
+         // guided mutation
+         // randomly move elements around
         return model;
     }
 

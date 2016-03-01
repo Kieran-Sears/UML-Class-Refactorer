@@ -18,13 +18,13 @@ import java.util.HashMap;
  *
  * @author Kieran
  */
-public class DependencyMatrix {
+public class RelationshipMatrix {
 
     HashMap<Integer, String> reverseLookupTable = new HashMap();
     HashMap<String, Integer> lookupTable = new HashMap();
     int[][] associationMatrix;
 
-    public DependencyMatrix(ArrayList<Component> components, ArrayList<Association> associations) {
+    public RelationshipMatrix(ArrayList<Component> components, ArrayList<Association> associations) {
 
         // get number of classes for matrix
         ArrayList<Class> classes = new ArrayList();

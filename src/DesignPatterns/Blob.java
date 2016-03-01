@@ -5,59 +5,77 @@
  */
 package DesignPatterns;
 
+import DataTypes.Class.Attribute;
+import DataTypes.Class.Operation;
+import DataTypes.Class.Parameter;
+import DataTypes.Component;
+import Evolution.MetaModel;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+
 /**
  *
  * @author Kieran
  */
-public class Blob extends AntiPattern {
+public class Blob extends AntiPattern implements AntiPatternAnalyser {
 
-    public void blob() {
-        identify();
-        analyseContracts();
+    MetaModel model;
+
+    @Override
+    public MutationHeuristic scanModel(MetaModel model) {
+        this.model = model;
+        HashMap<Operation, Attribute> identifyContracts = identifyContracts();
         removeRedundantAssociations();
         migrateAssociates();
         removeTransientAssociations();
+        return mutationHeuristic;
     }
 
-    public void identify() {
-        /*
-         Identify or categorize related attributes and operations according to contracts. These
-         contracts should be cohesive in that they all directly relate to a common focus, behavior,
-         or function within the overall system. For example, a library system architecture diagram
-         is represented with a potential Blob class called LIBRARY. In the example shown in
-         Figure 5.3, the LIBRARY class encapsulates the sum total of all the system’s
-         functionality. Therefore, the first step is to identify cohesive sets of operations and
-         attributes that represent contracts. In this case, we could gather operations related to
-         catalog management, like Sort_Catalog and Search_Catalog, as shown in Figure 5.4.
-         We could also identify all operations and attributes related to individual items, such as
-         Print_Item, Delete_Item, and so on.
-         */
-    }
-
-    public void analyseContracts() {
-        /*
-         The second step is to look for “natural homes” for these contract−based collections of
-         functionality and then migrate them there. In this example, we gather operations related
-         to catalogs and migrate them from the LIBRARY class and move them to the CATALOG
-         class, as shown in Figure 5.5. We do the same with operations and attributes related to
-         items, moving them to the ITEM class. This both simplifies the LIBRARY class and
-         makes the ITEM and CATALOG classes more than simple encapsulated data tables. The
-         result is a better object−oriented design.
-         */
+    /*
+     Identify or categorize related attributes and operations according to contracts.
+     identify cohesive sets of operations and attributes that represent contracts.
+     e.g. catalog management, like Sort_Catalog and Search_Catalog.
+     identify all operations and attributes related to individual items.
+     e.g. Print_Item, Delete_Item.
+     */
+    public HashMap<Operation, Attribute> identifyContracts() {
+        ArrayList<Component> components = model.getComponents();
+        HashMap<Operation, Attribute> contracts = new HashMap();
+        for (Component component : components) {
+            if (component instanceof Operation) {
+                Operation operation = (Operation) component;
+                ArrayList<Parameter> behaviourFeature = operation.getBehaviourFeature();
+                Iterator<Parameter> iterator = behaviourFeature.iterator();
+                while (iterator.hasNext()) {
+                    Parameter parameter = iterator.next();
+                    String type = parameter.getType();
+                    for (Component contractedAttribute : components) {
+                        if (contractedAttribute instanceof Attribute) {
+                            Attribute attribute = (Attribute) contractedAttribute;
+                            if (attribute.getID().equalsIgnoreCase(type)) {
+                                contracts.put(operation, attribute);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return contracts;
     }
 
     public void removeRedundantAssociations() {
         /*
-         The third step is to remove all “far−coupled,” or redundant, indirect associations. In the
-         example, the ITEM class is initially far−coupled to the LIBRARY class in that each item
+         remove  redundant, indirect associations. 
+         ITEM class is initially far−coupled to the LIBRARY class in that each item
          really belongs to a CATALOG, which in turn belongs to a LIBRARY.
          */
     }
 
     public void migrateAssociates() {
         /*
-         Next, where appropriate, we migrate associates to derived classes to a common base
-         class. In the example, once the far−coupling has been removed between the LIBRARY
+         migrate associates to derived classes to a common base class.
+         e.g. once the far−coupling has been removed between the LIBRARY
          and ITEM classes, we need to migrate ITEMs to CATALOGs.
          */
     }
@@ -71,4 +89,5 @@ public class Blob extends AntiPattern {
          a specific instance of a check−out or search.
          */
     }
+
 }

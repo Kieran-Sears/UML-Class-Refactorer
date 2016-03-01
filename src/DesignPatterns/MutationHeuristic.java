@@ -5,14 +5,10 @@
  */
 package DesignPatterns;
 
-import Evolution.MetaModel;
-
 /**
  *
  * @author Kieran
  */
-public interface AntiPatternAnalyser {
-    
-    public MutationHeuristic scanModel(MetaModel model);
+public class MutationHeuristic {
     
 }
