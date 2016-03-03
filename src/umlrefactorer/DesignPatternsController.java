@@ -25,7 +25,10 @@ public class DesignPatternsController {
     }
     
     public void scanForAntiPatterns(MetaModel model){
-   
+    // NOTE TO SELF : you were last looking at how dependencies were identified,
+        // how associations fit into this, you were coding the blob but wanted to
+        // change the relationshipMatrix, to accomodate these relationships rather 
+        // than getting the blob to figure them out.
     }
     
     
