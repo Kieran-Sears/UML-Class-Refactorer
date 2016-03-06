@@ -9,12 +9,10 @@ import DataTypes.Class.Association;
 import DataTypes.Class.Attribute;
 import DataTypes.Class.Class;
 import DataTypes.Class.Operation;
-import DataTypes.Class.OwnedEnd;
 import DataTypes.Class.Parameter;
 import DataTypes.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.UUID;
 
 /**
@@ -49,37 +47,11 @@ public class RelationshipMatrix {
             classCounter++;
         }
 
-        // turn aggregations and compositions into dependencies
-        for (Association association : associations) {
-            // assuming all associations are attribute "collections of objects"
-            Attribute attribute = new Attribute();
-            // get original link between classes
-            String source = ((OwnedEnd) association.getOwnedEnds()[0]).getType();
-            String target = ((OwnedEnd) association.getOwnedEnds()[1]).getType();
-            attribute.setID(UUID.randomUUID().toString());
+        sortAssociations(components, associations);
+        sortMethodDependencies(components, associations);
+    }
 
-            
-            for (Component component : components) {
-                if (component.getID().equalsIgnoreCase(target)) {
-                    Class classe = (DataTypes.Class.Class) component;
-                    System.out.println("target " + classe.getName());
-                    attribute.setName("collection<" + classe.getName() + ">");
-                    attribute.setDependency(classe.getID());
-                }
-            }
-             int indexOf = -1;
-            for (Component component : components) {
-                if (component.getID().equalsIgnoreCase(source)) {
-                    Class classe = (DataTypes.Class.Class) component;
-                    System.out.println("source " + classe.getName());
-                    indexOf = components.indexOf(classe);
-                    addDependency(classe.getID(), attribute.getDependency());
-                }
-            }
-           
-             components.add(indexOf + 1, attribute);
-        }
-
+    public void sortMethodDependencies(ArrayList<Component> components, ArrayList<Association> associations) {
         // add method dependencies
         DataTypes.Class.Class classee = null;
         for (Component component : components) {
@@ -89,9 +61,54 @@ public class RelationshipMatrix {
             if (component instanceof Operation) {
                 ArrayList<Parameter> behaviourFeature = ((Operation) component).getBehaviourFeature();
                 for (Parameter parameter : behaviourFeature) {
+                    System.out.println("classee.getID() = " + classee.getID() + " / parameter.getType()" + parameter.getType());
                     addDependency(classee.getID(), parameter.getType());
                 }
             }
+        }
+    }
+
+    public void sortAssociations(ArrayList<Component> components, ArrayList<Association> associations) {
+        // turn aggregations and compositions into dependencies
+        for (Association association : associations) {
+            // assuming all associations are attribute "collections of objects"
+            Attribute attribute = new Attribute();
+            // get original link between classes
+
+            attribute.setID(UUID.randomUUID().toString());
+
+            for (Component component : components) {
+                if (component.getID().equalsIgnoreCase(association.getSource())) {
+                    if (component instanceof DataTypes.Class.Class) {
+                        for (Component componentz : components) {
+                            if (componentz.getID().equalsIgnoreCase(association.getTarget())) {
+                                if (componentz instanceof DataTypes.Class.Class) {
+                                    addDependency(association.getSource(), association.getTarget());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // turn aggregation / composition into attribute of collection with Type "target"
+            for (Component component : components) {
+                if (component.getID().equalsIgnoreCase(association.getTarget())) {
+                    Class classe = (DataTypes.Class.Class) component;
+                    attribute.setName("collection<" + classe.getName() + ">");
+                    attribute.setDependency(classe.getID());
+                }
+            }
+            int indexOf = -1;
+            for (Component component : components) {
+                if (component.getID().equalsIgnoreCase(association.getSource())) {
+                    Class classe = (DataTypes.Class.Class) component;
+                    indexOf = components.indexOf(classe);
+                    addDependency(classe.getID(), attribute.getDependency());
+                }
+            }
+
+            components.add(indexOf + 1, attribute);
         }
 
     }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Profile name="Dissertation_profile" xmi:id="dIB7GMqGAqAABgbp_profile" xmi:version="2.1" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/2.0.0/UML" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1">
+	<packageImport xmi:id="dIB7GMqGAqAABgbp_profile_UMLMetaModel">
+		<importedPackage href="pathmap://UML_METAMODELS/UML.metamodel.uml#_0" xmi:type="uml:Model"/>
+	</packageImport>
+	<eAnnotations source="http://www.eclipse.org/uml2/2.0.0/UML" xmi:id="dIB7GMqGAqAABgbp_profile_definition">
+		<contents name="Dissertation_profile" nsPrefix="Dissertation_profile" nsURI="http:///schemas/Dissertation_profile/0" xmi:id="dIB7GMqGAqAABgbp_content" xmi:type="ecore:EPackage">
+			<eClassifiers name="Interface" xmi:id="qqziksqGAqAABg5V_classifier" xmi:type="ecore:EClass">
+				<eAnnotations references="qqziksqGAqAABg5V" source="http://www.eclipse.org/uml2/2.0.0/UML" xmi:id="qqziksqGAqAABg5V_annotation"/>
+				<eStructuralFeatures lowerBound="1" name="base_Interface" ordered="false" xmi:id="qqziksqGAqAABg5V_structuralFeature" xmi:type="ecore:EReference">
+					<eType href="http://www.eclipse.org/uml2/2.0.0/UML#//Interface" xmi:type="ecore:EClass"/>
+				</eStructuralFeatures>
+			</eClassifiers>
+		</contents>
+	</eAnnotations>
+	<packagedElement name="Interface" xmi:id="qqziksqGAqAABg5V" xmi:type="uml:Stereotype">
+		<ownedAttribute association="qqziksqGAqAABg5V_extension" name="base_Interface" xmi:id="qqziksqGAqAABg5V_to">
+			<type href="pathmap://UML_METAMODELS/UML.metamodel.uml#Interface" xmi:type="uml:Class"/>
+		</ownedAttribute>
+	</packagedElement>
+	<packagedElement memberEnd="qqziksqGAqAABg5V_from qqziksqGAqAABg5V_to" name="Class_Interface" xmi:id="qqziksqGAqAABg5V_extension" xmi:type="uml:Extension">
+		<ownedEnd aggregation="composite" association="qqziksqGAqAABg5V_extension" type="qqziksqGAqAABg5V" xmi:id="qqziksqGAqAABg5V_from" xmi:type="uml:ExtensionEnd"/>
+	</packagedElement>
+</uml:Profile>

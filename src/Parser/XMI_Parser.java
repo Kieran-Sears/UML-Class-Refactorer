@@ -11,7 +11,6 @@ import DataTypes.Class.Parameter;
 import DataTypes.Class.Operation;
 import DataTypes.Class.Association;
 import DataTypes.Class.Attribute;
-import DataTypes.Class.OwnedEnd;
 import DataTypes.Component;
 import java.io.File;
 import java.io.IOException;
@@ -90,7 +89,6 @@ public class XMI_Parser extends Parser {
                 _class.setID(attributes.getNamedItem("xmi:id").getNodeValue());
                 _class.setIsAbstract(Boolean.parseBoolean(attributes.getNamedItem("isAbstract").getNodeValue()));
                 _class.setName(attributes.getNamedItem("name").getNodeValue());
-                _class.setVisibility(attributes.getNamedItem("visibility").getNodeValue());
                 componentArray.add(_class);
                 ArrayList<Operation> classOperations = getOperations(attributes.getNamedItem("xmi:id").getNodeValue());
                 for (Operation operation : classOperations) {
@@ -112,21 +110,10 @@ public class XMI_Parser extends Parser {
         expr = xpath.compile("//packagedElement[@xmi:id='" + className + "']/ownedAttribute");
         NodeList classAttributes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
         for (int i = 0; i < classAttributes.getLength(); i++) {
-            // <ownedAttribute aggregation="none" isDerived="false" isDerivedUnion="false" isID="false"
-            // isLeaf="false" isReadOnly="false" isStatic="false" name="cardNumber" 
-            //        visibility="private" xmi:id="ilwpX0qGAqAABgbW" xmi:type="uml:Property">
             NamedNodeMap attributes = classAttributes.item(i).getAttributes();
             Attribute attribute = new Attribute();
-            attribute.setAggregation(attributes.getNamedItem("aggregation").getNodeValue());
-            attribute.setIsDerived(Boolean.parseBoolean(attributes.getNamedItem("isDerived").getNodeValue()));
-            attribute.setIsDerivedUnion(Boolean.parseBoolean(attributes.getNamedItem("isDerivedUnion").getNodeValue()));
-            attribute.setIsID(Boolean.parseBoolean(attributes.getNamedItem("isID").getNodeValue()));
-            attribute.setIsLeaf(Boolean.parseBoolean(attributes.getNamedItem("isLeaf").getNodeValue()));
-            attribute.setIsReadOnly(Boolean.parseBoolean(attributes.getNamedItem("isReadOnly").getNodeValue()));
-            attribute.setIsStatic(Boolean.parseBoolean(attributes.getNamedItem("isStatic").getNodeValue()));
             attribute.setID(attributes.getNamedItem("xmi:id").getNodeValue());
             attribute.setName(attributes.getNamedItem("name").getNodeValue());
-            attribute.setVisibility(attributes.getNamedItem("visibility").getNodeValue());
             attributeArray.add(attribute);
         }
         return attributeArray;
@@ -137,31 +124,16 @@ public class XMI_Parser extends Parser {
         expr = xpath.compile("//packagedElement[@xmi:id='" + className + "']/ownedOperation");
         NodeList classOperations = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
         for (int i = 0; i < classOperations.getLength(); i++) {
-            /*
-             <ownedOperation isAbstract="false" isLeaf="false" isOrdered="false" isQuery="false" 
-             isStatic="false" isUnique="true" name="doMenu" visibility="public" xmi:id="AWzxX0qGAqAABgZo" 
-             xmi:type="uml:Operation">
-             <ownedParameter direction="return" xmi:id="AWzxX0qGAqAABgZo_return" xmi:type="uml:Parameter"/>
-             </ownedOperation>
-             */
             NamedNodeMap attributes = classOperations.item(i).getAttributes();
             Operation operation = new Operation();
-            operation.setIsAbstract(Boolean.parseBoolean(attributes.getNamedItem("isAbstract").getNodeValue()));
-            operation.setIsLeaf(Boolean.parseBoolean(attributes.getNamedItem("isLeaf").getNodeValue()));
-            operation.setIsOrdered(Boolean.parseBoolean(attributes.getNamedItem("isOrdered").getNodeValue()));
-            operation.setIsQuery(Boolean.parseBoolean(attributes.getNamedItem("isQuery").getNodeValue()));
-            operation.setIsStatic(Boolean.parseBoolean(attributes.getNamedItem("isStatic").getNodeValue()));
-            operation.setIsUnique(Boolean.parseBoolean(attributes.getNamedItem("isUnique").getNodeValue()));
             operation.setID(attributes.getNamedItem("xmi:id").getNodeValue());
             operation.setName(attributes.getNamedItem("name").getNodeValue());
-            operation.setVisibility(attributes.getNamedItem("visibility").getNodeValue());
             operation.setBehaviourFeature(extractParameters(className));
             operationArray.add(operation);
         }
         return operationArray;
     }
 
-  
     public ArrayList<Parameter> extractParameters(String className) throws XPathExpressionException {
         ArrayList<Parameter> parameterArray = new ArrayList();
         expr = xpath.compile("//packagedElement[@xmi:id='" + className + "']/ownedOperation/ownedParameter");
@@ -169,17 +141,17 @@ public class XMI_Parser extends Parser {
         for (int i = 0; i < operationParameters.getLength(); i++) {
             NamedNodeMap attributes = operationParameters.item(i).getAttributes();
             if (((Attr) attributes.getNamedItem("type")) != null) {
+                String nodeValue = attributes.getNamedItem("type").getNodeValue();
+                if (!nodeValue.equalsIgnoreCase("int_id") 
+                        &&!nodeValue.equalsIgnoreCase("String_id") 
+                        &&!nodeValue.equalsIgnoreCase("Boolean_id") 
+                        &&!nodeValue.equalsIgnoreCase("void_id")) {
                 Parameter parameter = new Parameter();
                 parameter.setID(attributes.getNamedItem("xmi:id").getNodeValue());
                 parameter.setType(attributes.getNamedItem("type").getNodeValue());
                 parameterArray.add(parameter);
+                }
             }
-//            expr = xpath.compile("//packagedElement[@xmi:id='" + className + "']/ownedOperation/ownedParameter/type");
-//            NodeList parameterHRefs = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-//            for (int j = 0; j < parameterHRefs.getLength(); j++) {
-//                NamedNodeMap attributes1 = parameterHRefs.item(j).getAttributes();
-//                parameter.setDataType(attributes1.getNamedItem("href").getNodeValue().substring(attributes1.getNamedItem("href").getNodeValue().indexOf("#")+1));
-//            }
         }
         return parameterArray;
     }
@@ -192,39 +164,12 @@ public class XMI_Parser extends Parser {
             //<packagedElement isAbstract="false" isDerived="false" isLeaf="false" memberEnd="gEOpX0qGAqAABgcs wEOpX0qGAqAABgcv" xmi:id="f4OpX0qGAqAABgcq" xmi:type="uml:Association">
             NamedNodeMap attributes = assocations.item(i).getAttributes();
             Association association = new Association();
-            association.setMemberEnd(attributes.getNamedItem("memberEnd").getNodeValue());
-            association.setXmi_type(attributes.getNamedItem("xmi:type").getNodeValue());
-            association.setIsDerived(Boolean.parseBoolean(attributes.getNamedItem("isDerived").getNodeValue()));
-            association.setIsLeaf(Boolean.parseBoolean(attributes.getNamedItem("isLeaf").getNodeValue()));
-            association.setIsAbstract(Boolean.parseBoolean(attributes.getNamedItem("isAbstract").getNodeValue()));
             association.setID(attributes.getNamedItem("xmi:id").getNodeValue());
-            expr = xpath.compile("//packagedElement[@xmi:id='" + association.getID() + "']/ownedEnd");
-            NodeList ownedEnds = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-            OwnedEnd[] ends = new OwnedEnd[ownedEnds.getLength()];
-            for (int j = 0; j < ownedEnds.getLength(); j++) {
-                /*
-                 <ownedEnd aggregation="none" association="f4OpX0qGAqAABgcq" isDerived="false" isDerivedUnion="false" 
-                 isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false" type="k4iBX0qGAqAABgXy" 
-                 xmi:id="gEOpX0qGAqAABgcs" xmi:type="uml:Property">
-                 */
-                NamedNodeMap attributes1 = ownedEnds.item(j).getAttributes();
-                OwnedEnd end = new OwnedEnd();
-                end.setAggregation(attributes1.getNamedItem("aggregation").getNodeValue());
-                end.setAssociation(attributes1.getNamedItem("association").getNodeValue());
-                end.setIsDerived(Boolean.parseBoolean(attributes1.getNamedItem("isDerived").getNodeValue()));
-                end.setIsDerivedUnion(Boolean.parseBoolean(attributes1.getNamedItem("isDerivedUnion").getNodeValue()));
-                end.setIsLeaf(Boolean.parseBoolean(attributes1.getNamedItem("isLeaf").getNodeValue()));
-                end.setIsNavigable(Boolean.parseBoolean(attributes1.getNamedItem("isNavigable").getNodeValue()));
-                end.setIsReadOnly(Boolean.parseBoolean(attributes1.getNamedItem("isReadOnly").getNodeValue()));
-                end.setIsStatic(Boolean.parseBoolean(attributes1.getNamedItem("isStatic").getNodeValue()));
-                end.setType(attributes1.getNamedItem("type").getNodeValue());
-                end.setID(attributes1.getNamedItem("xmi:id").getNodeValue());
-                ends[j] = end;
-            }
-            association.setOwnedEnds(ends);
+            String[] split = attributes.getNamedItem("memberEnd").getNodeValue().split(" ");
+            association.setSource((String) xpath.compile("(//*[@xmi:id='" + split[0] + "']/@type)[1]").evaluate(doc, XPathConstants.STRING));
+            association.setTarget((String) xpath.compile("(//*[@xmi:id='" + split[1] + "']/@type)[1]").evaluate(doc, XPathConstants.STRING));
             classAssociations.add(association);
         }
-
         return classAssociations;
     }
 }

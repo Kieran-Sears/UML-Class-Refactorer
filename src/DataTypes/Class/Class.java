@@ -13,9 +13,6 @@ import DataTypes.Component;
  */
 public class Class extends Component  {
     
-    
-    // e.g. <packagedElement xmi:type="uml:Class" name="A" xmi:id="0x1f502_4" visibility="public" isAbstract="false">
-    
     private String name;
     private String visibility;
     private Boolean isAbstract;

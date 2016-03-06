@@ -12,91 +12,16 @@ import DataTypes.Component;
  * @author Kieran
  */
 public class Attribute extends Component {
-    // <ownedAttribute aggregation="none" isDerived="false" isDerivedUnion="false" isID="false"
-    // isLeaf="false" isReadOnly="false" isStatic="false" name="cardNumber" 
-    //        visibility="private" xmi:id="ilwpX0qGAqAABgbW" xmi:type="uml:Property">
-
-    public String aggregation;
-    public boolean isDerived;
-    public boolean isDerivedUnion;
-    public boolean isID;
-    public boolean isLeaf;
-    public boolean isReadOnly;
-    public boolean isStatic;
+ 
     public String name;
-    public String visibility;
     public String dependency;
-
-    public String getAggregation() {
-        return aggregation;
-    }
-
-    public void setAggregation(String aggregation) {
-        this.aggregation = aggregation;
-    }
-
-    public boolean isIsDerived() {
-        return isDerived;
-    }
-
-    public void setIsDerived(boolean isDerived) {
-        this.isDerived = isDerived;
-    }
-
-    public boolean isIsDerivedUnion() {
-        return isDerivedUnion;
-    }
-
-    public void setIsDerivedUnion(boolean isDerivedUnion) {
-        this.isDerivedUnion = isDerivedUnion;
-    }
-
-    public boolean isIsID() {
-        return isID;
-    }
-
-    public void setIsID(boolean isID) {
-        this.isID = isID;
-    }
-
-    public boolean isIsLeaf() {
-        return isLeaf;
-    }
-
-    public void setIsLeaf(boolean isLeaf) {
-        this.isLeaf = isLeaf;
-    }
-
-    public boolean isIsReadOnly() {
-        return isReadOnly;
-    }
-
-    public void setIsReadOnly(boolean isReadOnly) {
-        this.isReadOnly = isReadOnly;
-    }
-
-    public boolean isIsStatic() {
-        return isStatic;
-    }
-
-    public void setIsStatic(boolean isStatic) {
-        this.isStatic = isStatic;
-    }
-
+    
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(String visibility) {
-        this.visibility = visibility;
     }
 
     public String getDependency() {
@@ -106,8 +31,6 @@ public class Attribute extends Component {
     public void setDependency(String type) {
         this.dependency = type;
     }
-
-    
     
     @Override
     public String toString() {

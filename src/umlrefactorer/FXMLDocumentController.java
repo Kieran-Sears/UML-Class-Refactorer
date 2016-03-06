@@ -38,7 +38,7 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void handleButtonAction(ActionEvent event) {
-        File file = new File("C:\\Users\\Kieran\\Documents\\NetBeansProjects\\UMLRefactorer\\testcases/bookshop_2-1.xmi");
+        File file = new File("C:\\Users\\Kieran\\Documents\\NetBeansProjects\\UMLRefactorer\\src/Parser/bookshopCaseScenario.xmi");
         MetaModel model = parser.extractModelFromXMI(file);
        // model.printModelToConsole(); // for debugging
         // TODO Handle Invalid Input
