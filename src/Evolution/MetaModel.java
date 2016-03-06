@@ -17,7 +17,7 @@ import java.util.HashMap;
 public class MetaModel {
 
     // fitness is for each class in the model, stored by class xmi:id key
-    HashMap<String, FitnessMetrics> fitness;
+    HashMap<String, FitnessMetrics> fitness = new HashMap();
     // shows connections between classes
     RelationshipMatrix dependencies;
     // holds all the methods attributes and classes
@@ -40,6 +40,7 @@ public class MetaModel {
                 DataTypes.Class.Class classe = (DataTypes.Class.Class) component;
                 FitnessMetrics fit = new FitnessMetrics();
                 //TODO insert metric calls here
+             
                 fitness.put(classe.getID(), fit);
             }
         }

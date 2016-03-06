@@ -104,7 +104,7 @@ public class Operation extends Component  {
 
     @Override
     public String toString() {
-        String string = "\nOperation:" + "\n name=" + name + "\n visibility=" + visibility + "\n isAbstract=" + isAbstract + "\n";
+        String string = "\nOperation:" + "\n name=" + name  + "\n";
         Iterator<Parameter> iterator = parameters.iterator();
         while (iterator.hasNext()) {
             Parameter next = iterator.next();

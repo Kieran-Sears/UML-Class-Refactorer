@@ -5,7 +5,6 @@
  */
 package Evolution;
 
-import DataTypes.Class.Association;
 import DataTypes.Component;
 import DataTypes.Class.Class;
 import DataTypes.Class.Operation;
@@ -129,7 +128,7 @@ public class FitnessMetrics {
 
     @Override
     public String toString() {
-        return "Fitness{"
+        return "\nFitness{"
                 + " \nLackOfCohesion=" + LackOfCohesion
                 + ", \nDepthOfInheritanceTree=" + DepthOfInheritanceTree
                 + ", \nCouplingBetweenObjectClasses=" + CouplingBetweenObjectClasses
@@ -137,7 +136,7 @@ public class FitnessMetrics {
                 + ", \nResponseForAClass=" + ResponseForAClass
                 + ", \nWeightedMethodsPerClass=" + WeightedMethodsPerClass
                 + ", \ndistanceFromMainSequence=" + distanceFromMainSequence
-                + ",\n}";
+                + ",}\n\n";
     }
 
 }

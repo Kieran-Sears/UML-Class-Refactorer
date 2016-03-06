@@ -6,6 +6,7 @@
 package Evolution;
 
 import DataTypes.Class.Association;
+import DataTypes.Class.Attribute;
 import DataTypes.Class.Class;
 import DataTypes.Class.Operation;
 import DataTypes.Class.OwnedEnd;
@@ -13,6 +14,8 @@ import DataTypes.Class.Parameter;
 import DataTypes.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.UUID;
 
 /**
  *
@@ -34,7 +37,7 @@ public class RelationshipMatrix {
             }
         }
 
-        // initialise matrix and add associations
+        // initialise matrix and add dependencies
         this.associationMatrix = new int[classes.size()][classes.size()];
         int classCounter = 0;
         for (Class classe : classes) {
@@ -45,49 +48,59 @@ public class RelationshipMatrix {
             }
             classCounter++;
         }
+
+        // turn aggregations and compositions into dependencies
         for (Association association : associations) {
-             OwnedEnd source = (OwnedEnd) association.getOwnedEnds()[0];
-            OwnedEnd target = (OwnedEnd) association.getOwnedEnds()[1];
-            addDependency(source.getType(), target.getType(), source.getAggregation());
+            // assuming all associations are attribute "collections of objects"
+            Attribute attribute = new Attribute();
+            // get original link between classes
+            String source = ((OwnedEnd) association.getOwnedEnds()[0]).getType();
+            String target = ((OwnedEnd) association.getOwnedEnds()[1]).getType();
+            attribute.setID(UUID.randomUUID().toString());
+
+            
+            for (Component component : components) {
+                if (component.getID().equalsIgnoreCase(target)) {
+                    Class classe = (DataTypes.Class.Class) component;
+                    System.out.println("target " + classe.getName());
+                    attribute.setName("collection<" + classe.getName() + ">");
+                    attribute.setDependency(classe.getID());
+                }
+            }
+             int indexOf = -1;
+            for (Component component : components) {
+                if (component.getID().equalsIgnoreCase(source)) {
+                    Class classe = (DataTypes.Class.Class) component;
+                    System.out.println("source " + classe.getName());
+                    indexOf = components.indexOf(classe);
+                    addDependency(classe.getID(), attribute.getDependency());
+                }
+            }
+           
+             components.add(indexOf + 1, attribute);
         }
-        
+
         // add method dependencies
         DataTypes.Class.Class classee = null;
         for (Component component : components) {
-            if (component instanceof DataTypes.Class.Class){
-            classee = (DataTypes.Class.Class) component;
+            if (component instanceof DataTypes.Class.Class) {
+                classee = (DataTypes.Class.Class) component;
             }
-            if (component instanceof Operation){
+            if (component instanceof Operation) {
                 ArrayList<Parameter> behaviourFeature = ((Operation) component).getBehaviourFeature();
                 for (Parameter parameter : behaviourFeature) {
-                  addDependency(classee.getID(), parameter.getType(), "dependency");
+                    addDependency(classee.getID(), parameter.getType());
                 }
             }
         }
-        
+
     }
 
-    public void addDependency(String sourceID, String targetID, String dependencyType) {
+    public void addDependency(String sourceID, String targetID) {
         Integer source = lookupTable.get(sourceID);
         Integer target = lookupTable.get(targetID);
-        associationMatrix[source][target] = getDependencyIndex(dependencyType);
+        associationMatrix[source][target] = 1;
     }
-
-    private Integer getDependencyIndex(String dependencyType) {
-        switch (dependencyType) {
-            case "dependency": // one class1 depends on class2 for an instance or method parameter but is not related to class1's state
-                return 1;
-            case "none": // association
-                return 2;
-            case "aggregate": // aggregate association
-                return 3;
-            case "composite": // composite association
-                return 4;
-            default:
-                throw new AssertionError();
-        }
-    }
-
 
     @Override
     public String toString() {

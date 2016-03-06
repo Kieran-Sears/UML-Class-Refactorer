@@ -6,7 +6,6 @@
 package DataTypes.Class;
 
 import DataTypes.Component;
-import java.net.URL;
 
 /**
  *
@@ -26,6 +25,7 @@ public class Attribute extends Component {
     public boolean isStatic;
     public String name;
     public String visibility;
+    public String dependency;
 
     public String getAggregation() {
         return aggregation;
@@ -99,9 +99,19 @@ public class Attribute extends Component {
         this.visibility = visibility;
     }
 
+    public String getDependency() {
+        return dependency;
+    }
+
+    public void setDependency(String type) {
+        this.dependency = type;
+    }
+
+    
+    
     @Override
     public String toString() {
-        return "Attribute{\n" + "aggregation=" + aggregation + "\nisDerived=" + isDerived + "\nisDerivedUnion=" + isDerivedUnion + "\nisID=" + isID + "\nisLeaf=" + isLeaf + "\nisReadOnly=" + isReadOnly + "\nisStatic=" + isStatic + "\nname=" + name + "\nvisibility=" + visibility + '}';
+        return "Attribute{\n" + "\nname=" + name + "\ndependency=" + dependency + "\n\n}";
     }
 
  

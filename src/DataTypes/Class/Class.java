@@ -6,7 +6,6 @@
 package DataTypes.Class;
 
 import DataTypes.Component;
-import java.util.ArrayList;
 
 /**
  *
@@ -48,7 +47,7 @@ public class Class extends Component  {
 
     @Override
     public String toString() {
-        return "\nClass{" + "\nname=" + name + "\nvisibility=" + visibility + "\nisAbstract=" + isAbstract + '}';
+        return "\nClass{" + "\nname=" + name + "\n\n";
     }
   
     
