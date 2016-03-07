@@ -28,11 +28,11 @@ public class Operation extends Component  {
         this.name = name;
     }
 
-    public ArrayList<Parameter> getBehaviourFeature() {
+    public ArrayList<Parameter> getParameters() {
         return parameters;
     }
 
-    public void setBehaviourFeature(ArrayList<Parameter> behaviourFeature) {
+    public void setParameters(ArrayList<Parameter> behaviourFeature) {
         this.parameters = behaviourFeature;
     }
 

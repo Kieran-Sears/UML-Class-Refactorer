@@ -13,8 +13,8 @@ import DataTypes.Component;
  */
 public class Attribute extends Component {
  
-    public String name;
-    public String dependency;
+    private String name;
+    private String dependency;
     
     public String getName() {
         return name;
@@ -34,7 +34,7 @@ public class Attribute extends Component {
     
     @Override
     public String toString() {
-        return "Attribute{\n" + "\nname=" + name + "\ndependency=" + dependency + "\n\n}";
+        return "Attribute{" + "\nname=" + name + "\ndependency=" + dependency + "}\n\n";
     }
 
  

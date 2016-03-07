@@ -27,39 +27,39 @@ public class GeneticAlgorithm {
     private float mutationRate;
     private float crossoverRate;
 
-    // constructor
-    public GeneticAlgorithm(MetaModel model, int populationSize, float mutationRate, float crossoverRate) {
+    public void initialiseGA(MetaModel model, int populationSize, float mutationRate, float crossoverRate) {
+        
         this.mutationRate = mutationRate;
         this.crossoverRate = crossoverRate;
+        model.initialiseDependenciesAndFitness();
         population.add(model);
+        
         for (int i = 1; i < populationSize; i++) {
             MetaModel crossedover = crossover(model);
             MetaModel crossedAndMutated = mutate(crossedover);
-            crossedAndMutated.updateDependencyMatrix();
-            crossedAndMutated.updateFitnessValues();
+            model.updateDependenciesAndFitness();
             population.add(crossedAndMutated);
         }
     }
-    
 
     public void evolvePopulation() {
         for (MetaModel model : population) {
             MetaModel crossedover = crossover(model);
             MetaModel crossedAndMutated = mutate(crossedover);
-            crossedAndMutated.updateDependencyMatrix();
-            crossedAndMutated.updateFitnessValues();
+            crossedAndMutated.dependencies.sortMethodDependencies(crossedAndMutated.chromosome);
+            crossedAndMutated.updateDependenciesAndFitness();
         }
     }
-    // evolution operators
 
+    // evolution operators
     private MetaModel mutate(MetaModel model) {
         // default mutation
         return model;
     }
-    
-     private MetaModel mutate(MetaModel model, MutationHeuristic heuristic) {
-         // guided mutation
-         // randomly move elements around
+
+    private MetaModel mutate(MetaModel model, MutationHeuristic heuristic) {
+        // guided mutation
+        // randomly move elements around
         return model;
     }
 

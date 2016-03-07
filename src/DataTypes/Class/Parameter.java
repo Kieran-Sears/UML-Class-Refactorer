@@ -45,12 +45,9 @@ public class Parameter extends Component {
 
     @Override
     public String toString() {
-        String string = "\n   Parameter{";
+        String string = "\n   Parameter";
 
-        string += "\n   name=" + name
-                + "\n   type=" + type;
-              
-        string += "}\n";
+        string += "\n   -type=" + type;
         return string;
     }
 

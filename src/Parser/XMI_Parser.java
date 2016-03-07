@@ -128,15 +128,15 @@ public class XMI_Parser extends Parser {
             Operation operation = new Operation();
             operation.setID(attributes.getNamedItem("xmi:id").getNodeValue());
             operation.setName(attributes.getNamedItem("name").getNodeValue());
-            operation.setBehaviourFeature(extractParameters(className));
+            operation.setParameters(extractParameters(attributes.getNamedItem("xmi:id").getNodeValue()));
             operationArray.add(operation);
         }
         return operationArray;
     }
 
-    public ArrayList<Parameter> extractParameters(String className) throws XPathExpressionException {
+    public ArrayList<Parameter> extractParameters(String operationID) throws XPathExpressionException {
         ArrayList<Parameter> parameterArray = new ArrayList();
-        expr = xpath.compile("//packagedElement[@xmi:id='" + className + "']/ownedOperation/ownedParameter");
+        expr = xpath.compile("//ownedOperation[@xmi:id='" + operationID + "']/ownedParameter");
         NodeList operationParameters = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
         for (int i = 0; i < operationParameters.getLength(); i++) {
             NamedNodeMap attributes = operationParameters.item(i).getAttributes();

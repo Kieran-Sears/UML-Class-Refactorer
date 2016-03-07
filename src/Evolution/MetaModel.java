@@ -8,7 +8,6 @@ package Evolution;
 import DataTypes.Class.Association;
 import DataTypes.Component;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  *
@@ -17,7 +16,7 @@ import java.util.HashMap;
 public class MetaModel {
 
     // fitness is for each class in the model, stored by class xmi:id key
-    HashMap<String, FitnessMetrics> fitness = new HashMap();
+    FitnessMetrics fitness;
     // shows connections between classes
     RelationshipMatrix dependencies;
     // holds all the methods attributes and classes
@@ -25,27 +24,19 @@ public class MetaModel {
     // a list of associations present (composition, aggregation, generalisation etc)
     ArrayList<Association> associations;
 
-    
-    
-    
-    public void updateDependencyMatrix() {
-
-    }
-
-    public void updateFitnessValues() {
+    public void initialiseDependenciesAndFitness(){
         dependencies = new RelationshipMatrix(chromosome, associations);
-        // check components have been added
-        for (Component component : chromosome) {
-            if (component instanceof DataTypes.Class.Class) {
-                DataTypes.Class.Class classe = (DataTypes.Class.Class) component;
-                FitnessMetrics fit = new FitnessMetrics();
-                //TODO insert metric calls here
-             
-                fitness.put(classe.getID(), fit);
-            }
-        }
+        chromosome = dependencies.changeAssociationsToAttributes(chromosome, associations);
+        dependencies.sortMethodDependencies(chromosome);
+        fitness = new FitnessMetrics(dependencies, chromosome);
     }
-
+    
+    public void updateDependenciesAndFitness(){
+     dependencies.sortMethodDependencies(chromosome);
+     fitness = new FitnessMetrics(dependencies, chromosome);
+    }
+    
+  
 
     // getters and setters
     public ArrayList<Component> getComponents() {
@@ -64,13 +55,6 @@ public class MetaModel {
         this.associations = associations;
     }
 
-    public HashMap<String, FitnessMetrics> getFitness() {
-        return fitness;
-    }
-
-    public void setFitness(HashMap<String, FitnessMetrics> fitness) {
-        this.fitness = fitness;
-    }
 
     public RelationshipMatrix getDependencies() {
         return dependencies;

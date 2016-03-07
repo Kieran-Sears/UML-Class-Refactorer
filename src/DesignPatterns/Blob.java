@@ -45,7 +45,7 @@ public class Blob extends AntiPattern implements AntiPatternAnalyser {
         for (Component component : components) {
             if (component instanceof Operation) {
                 Operation operation = (Operation) component;
-                ArrayList<Parameter> behaviourFeature = operation.getBehaviourFeature();
+                ArrayList<Parameter> behaviourFeature = operation.getParameters();
                 Iterator<Parameter> iterator = behaviourFeature.iterator();
                 while (iterator.hasNext()) {
                     Parameter parameter = iterator.next();

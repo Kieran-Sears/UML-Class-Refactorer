@@ -21,17 +21,17 @@ import java.util.UUID;
  */
 public class RelationshipMatrix {
 
-    HashMap<Integer, String> reverseLookupTable = new HashMap();
-    HashMap<String, Integer> lookupTable = new HashMap();
-    int[][] associationMatrix;
+    private final HashMap<Integer, String> reverseLookupTable = new HashMap();
+    private final HashMap<String, Integer> lookupTable = new HashMap();
+    public int[][] associationMatrix;
 
     public RelationshipMatrix(ArrayList<Component> components, ArrayList<Association> associations) {
 
         // get number of classes for matrix
         ArrayList<Class> classes = new ArrayList();
-        for (int i = 0; i < components.size(); i++) {
-            if (components.get(i) instanceof Class) {
-                classes.add((Class) components.get(i));
+        for (Component component : components) {
+            if (component instanceof Class) {
+                classes.add((Class) component);
             }
         }
 
@@ -46,50 +46,14 @@ public class RelationshipMatrix {
             }
             classCounter++;
         }
-
-        sortAssociations(components, associations);
-        sortMethodDependencies(components, associations);
     }
 
-    public void sortMethodDependencies(ArrayList<Component> components, ArrayList<Association> associations) {
-        // add method dependencies
-        DataTypes.Class.Class classee = null;
-        for (Component component : components) {
-            if (component instanceof DataTypes.Class.Class) {
-                classee = (DataTypes.Class.Class) component;
-            }
-            if (component instanceof Operation) {
-                ArrayList<Parameter> behaviourFeature = ((Operation) component).getBehaviourFeature();
-                for (Parameter parameter : behaviourFeature) {
-                    System.out.println("classee.getID() = " + classee.getID() + " / parameter.getType()" + parameter.getType());
-                    addDependency(classee.getID(), parameter.getType());
-                }
-            }
-        }
-    }
-
-    public void sortAssociations(ArrayList<Component> components, ArrayList<Association> associations) {
-        // turn aggregations and compositions into dependencies
+    public ArrayList<Component> changeAssociationsToAttributes(ArrayList<Component> components, ArrayList<Association> associations){
+      // turn aggregations and compositions into dependencies
         for (Association association : associations) {
             // assuming all associations are attribute "collections of objects"
             Attribute attribute = new Attribute();
-            // get original link between classes
-
             attribute.setID(UUID.randomUUID().toString());
-
-            for (Component component : components) {
-                if (component.getID().equalsIgnoreCase(association.getSource())) {
-                    if (component instanceof DataTypes.Class.Class) {
-                        for (Component componentz : components) {
-                            if (componentz.getID().equalsIgnoreCase(association.getTarget())) {
-                                if (componentz instanceof DataTypes.Class.Class) {
-                                    addDependency(association.getSource(), association.getTarget());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
 
             // turn aggregation / composition into attribute of collection with Type "target"
             for (Component component : components) {
@@ -104,19 +68,57 @@ public class RelationshipMatrix {
                 if (component.getID().equalsIgnoreCase(association.getSource())) {
                     Class classe = (DataTypes.Class.Class) component;
                     indexOf = components.indexOf(classe);
-                    addDependency(classe.getID(), attribute.getDependency());
                 }
             }
-
+            // add the new attribute which was once an association. association array can now be ignored
             components.add(indexOf + 1, attribute);
         }
-
+        return components;
+    }
+    
+    public void sortMethodDependencies(ArrayList<Component> components) {
+        // add method dependencies
+        DataTypes.Class.Class classee = null;
+        for (Component component : components) {
+            // get the class the operation belongs to
+            if (component instanceof DataTypes.Class.Class) {
+                classee = (DataTypes.Class.Class) component;
+                System.out.println("    class :" + classee.getName());
+            }
+            // cycle operations for this class and get their parameter types
+            if (component instanceof Operation) {
+                Operation operation = (Operation) component;
+                System.out.println("#operation :" + operation.getName());
+                ArrayList<Parameter> parameters = operation.getParameters();
+                for (Parameter parameter : parameters) {
+                    System.out.println("-parameter :" + parameter.getType());
+                    // each param that uses another class is a dependency
+                    addDependency(classee.getID(), parameter.getType());
+                }
+            }
+            if (component instanceof Attribute) {
+                Attribute attribute = (Attribute) component;
+                if (attribute.getDependency() != null) {
+                    System.out.println("#attribute " + attribute.getName());
+                    System.out.println("-dependency " + attribute.getDependency());
+                    addDependency(classee.getID(), attribute.getDependency());
+                }
+            }
+        }
     }
 
-    public void addDependency(String sourceID, String targetID) {
+    private void addDependency(String sourceID, String targetID) {
         Integer source = lookupTable.get(sourceID);
         Integer target = lookupTable.get(targetID);
-        associationMatrix[source][target] = 1;
+        associationMatrix[source][target]++;
+    }
+
+    public String ReverseLookupClass(int id) {
+        return reverseLookupTable.get(id);
+    }
+
+    public Integer lookupClass(String id) {
+        return lookupTable.get(id);
     }
 
     @Override

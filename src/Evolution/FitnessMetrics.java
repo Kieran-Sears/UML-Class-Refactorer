@@ -17,37 +17,51 @@ import java.util.Iterator;
  */
 public class FitnessMetrics {
 
-    Class classe;
-    int LackOfCohesion;
-    int DepthOfInheritanceTree;
-    int CouplingBetweenObjectClasses;
-    int NumberOfChildren;
-    int ResponseForAClass;
-    int WeightedMethodsPerClass;
-    double distanceFromMainSequence;
+    RelationshipMatrix dependencies;
+    ArrayList<Component> components;
+    float lackOfCohesion;
+    float couplingBetweenObjectClasses;
+    float weightedMethodsPerClass;
+   // float distanceFromMainSequence;
 
+    public FitnessMetrics(RelationshipMatrix dependencies, ArrayList<Component> components) {
+        this.dependencies = dependencies;
+        this.components = components;
+        lackOfCohesion = lackOfCohesion();
+        couplingBetweenObjectClasses = couplingBetweenObjectClasses();
+        weightedMethodsPerClass = weightedMethodsPerClass();
+        // distanceFromMainSequence = distanceFromMainSequence();
+    }
 
-    public int LackOfCohesion() {
+    private int lackOfCohesion() {
         return 0;
     }
 
-    public int DepthOfInheritanceTree() {
-        return 0;
+    private float couplingBetweenObjectClasses() {
+        int runningTotal = 0;
+        int numOfClasses = 0;
+        for (Component component : components) {
+            if (component instanceof DataTypes.Class.Class) {
+                numOfClasses++;
+                Class classe = (DataTypes.Class.Class) component;
+                Integer classID = dependencies.lookupClass(classe.getID());
+                int forDebugging = runningTotal;
+                for (int i = 0; i < dependencies.associationMatrix.length; i++) {
+                    for (int j = 0; j < dependencies.associationMatrix.length; j++) {
+                        if (i == classID || j == classID) {
+                            if (dependencies.associationMatrix[i][j] == 1) {
+                                runningTotal++;
+                            }
+                        }
+                    }
+                }
+                System.out.println("Class " + classe.getName() + " coupling between classes = " + (runningTotal - forDebugging));
+            }
+        }
+        return runningTotal / numOfClasses;
     }
 
-    public int CouplingBetweenObjectClasses() {
-        return 0;
-    }
-
-    public int NumberOfChildren() {
-        return 0;
-    }
-
-    public int ResponseForAClass() {
-        return 0;
-    }
-
-    public int WeightedMethodsPerClass(ArrayList<Component> components) {
+    private float weightedMethodsPerClass() {
         Iterator<Component> iterator = components.iterator();
         int nrOfClasses = 0;
         int nrOfOperations = 0;
@@ -58,84 +72,71 @@ public class FitnessMetrics {
             }
             if (next instanceof Operation) {
                 nrOfOperations++;
-            } 
+            }
         }
         if (nrOfClasses == 0) {
             throw new IllegalArgumentException("Argument 'nrOfClasses' is 0");
-        }
-        else {
-        return nrOfOperations / nrOfClasses;
+        } else {
+            return nrOfOperations / nrOfClasses;
         }
     }
 
-    public void cohesionOfMethods(){
- 
+    private void cohesionOfMethods() {
+
     }
-    
-    public double distanceFromMainSequence(ArrayList<Component> components, RelationshipMatrix dependencies) {
 
-        int abstractClasses = 0;
-        int efferentCoupling = 0;
-        int afferentCoupling = 0;
-        int totalClasses = 0;
-        Iterator<Component> iterator = components.iterator();
-        while (iterator.hasNext()) {
-            Object next = iterator.next();
-            if (next instanceof Class) {
-                totalClasses++;
-                Class _class = (Class) next;
-                if (_class.getIsAbstract()) {
-                    abstractClasses++;
-                }
-                Integer dependencyID = dependencies.lookupTable.get(_class.getID());
-                int[] efferentArray = dependencies.associationMatrix[dependencyID];
-                for (int i = 0; i < efferentArray.length; i++) {
-                    if (efferentArray[i] != 0) {
-                        efferentCoupling++;
-                    }
-                }
-                int[][] afferentArray = dependencies.associationMatrix;
-                for (int i = 0; i < afferentArray.length; i++) {
-                    if (i != dependencyID) {
-                        int[] afferentArray1 = afferentArray[i];
-                        for (int j = 0; j < afferentArray1.length; j++) {
-                            if (j != dependencyID) {
-                                if (afferentArray1[j] != 0) {
-                                    afferentCoupling++;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
+//    public float distanceFromMainSequence(ArrayList<Component> components, RelationshipMatrix dependencies) {
+//
+////    D = (A + I − 1) / √2 
+////  Where:
+////    I = Efferent Coupling / ( Efferent Coupling + Afferent Coupling )
+////    A = Abstract Classes / Total Classes
+////      
+////        Afferent couplings : A class afferent couplings is a measure of how many other classes use the specific class.
+////        Efferent couplings : A class efferent couplings is a measure of how many different classes are used by the specific class.
 //        int abstractClasses = 0;
 //        int efferentCoupling = 0;
 //        int afferentCoupling = 0;
 //        int totalClasses = 0;
-//    D = (A + I − 1) / √2 
-//  Where:
-//    I = Efferent Coupling / ( Efferent Coupling + Afferent Coupling )
-//    A = Abstract Classes / Total Classes
-//      
-//        Afferent couplings : A class afferent couplings is a measure of how many other classes use the specific class.
-//        Efferent couplings : A class efferent couplings is a measure of how many different classes are used by the specific class.
-        double D = ((abstractClasses / totalClasses) + (efferentCoupling / (efferentCoupling + afferentCoupling))) / Math.sqrt(2);
-
-        return D; // TODO D.normalised to fall within 0 - 1 range
-    }
-
+//        Iterator<Component> iterator = components.iterator();
+//        while (iterator.hasNext()) {
+//            Object next = iterator.next();
+//            if (next instanceof Class) {
+//                totalClasses++;
+//                Class _class = (Class) next;
+//                if (_class.getIsAbstract()) {
+//                    abstractClasses++;
+//                }
+//                Integer dependencyID = dependencies.lookupTable.get(_class.getID());
+//                int[] efferentArray = dependencies.associationMatrix[dependencyID];
+//                for (int i = 0; i < efferentArray.length; i++) {
+//                    if (efferentArray[i] != 0) {
+//                        efferentCoupling++;
+//                    }
+//                }
+//                int[][] afferentArray = dependencies.associationMatrix;
+//                for (int i = 0; i < afferentArray.length; i++) {
+//                    if (i != dependencyID) {
+//                        int[] afferentArray1 = afferentArray[i];
+//                        for (int j = 0; j < afferentArray1.length; j++) {
+//                            if (j != dependencyID) {
+//                                if (afferentArray1[j] != 0) {
+//                                    afferentCoupling++;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return ((abstractClasses / totalClasses) + (efferentCoupling / (efferentCoupling + afferentCoupling))) / Math.sqrt(2);
+//    }
     @Override
     public String toString() {
-        return "\nFitness{"
-                + " \nLackOfCohesion=" + LackOfCohesion
-                + ", \nDepthOfInheritanceTree=" + DepthOfInheritanceTree
-                + ", \nCouplingBetweenObjectClasses=" + CouplingBetweenObjectClasses
-                + ", \nNumberOfChildren=" + NumberOfChildren
-                + ", \nResponseForAClass=" + ResponseForAClass
-                + ", \nWeightedMethodsPerClass=" + WeightedMethodsPerClass
-                + ", \ndistanceFromMainSequence=" + distanceFromMainSequence
+        return " \nLackOfCohesion=" + lackOfCohesion
+                + ", \nCouplingBetweenObjectClasses=" + couplingBetweenObjectClasses
+                + ", \nWeightedMethodsPerClass=" + weightedMethodsPerClass
+                // + ", \ndistanceFromMainSequence=" + distanceFromMainSequence
                 + ",}\n\n";
     }
 

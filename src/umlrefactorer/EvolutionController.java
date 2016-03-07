@@ -18,13 +18,14 @@ public class EvolutionController {
     
     
    public void initialiseGA(MetaModel mm, int populationSize, float mutationRate, float crossoverRate){
-   GA = new GeneticAlgorithm(mm, populationSize, mutationRate, crossoverRate);
+   GA = new GeneticAlgorithm();
+   GA.initialiseGA(mm, populationSize, mutationRate, crossoverRate);
    }
     
    public void evolvePopulation(int numOfGenerations){
        for (int i = 0; i < numOfGenerations; i++) {
            GA.evolvePopulation();
-           GA.outputResultsToConsole();
+          // GA.outputResultsToConsole();
            // GA.returnResultsAsHashmap(); // TODO GUI
        }
       
