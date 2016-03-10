@@ -5,6 +5,7 @@
  */
 package Evolution;
 
+import DataTypes.Component;
 import DesignPatterns.MutationHeuristic;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,7 +44,7 @@ public class GeneticAlgorithm {
     }
 
     public void evolvePopulation() {
-        rouletteSelection(population);
+        selection(population);
         for (MetaModel model : population) {
             MetaModel crossedAndMutated = mutate(model);
             crossedAndMutated.dependencies.sortMethodDependencies(crossedAndMutated.chromosome);
@@ -51,7 +52,7 @@ public class GeneticAlgorithm {
         }
     }
 
-    public ArrayList<MetaModel> rouletteSelection(ArrayList<MetaModel> population) {
+    public ArrayList<MetaModel> selection(ArrayList<MetaModel> population) {
         double randNum;
         int remainder = populationSize % 3;
         int divisor = populationSize - remainder;
@@ -66,34 +67,34 @@ public class GeneticAlgorithm {
         for (MetaModel individual : population) {
             MetaModel chosen = null;
             double totalCouplingFitness = 0;
-            double coupleMax = 0;
-            double coupleMin = 0;
-            double WMPCMax = 0;
-            double WMPCMin = 0;
             double totalCohesionFitness = 0;
             double totalWeightedMethodsFitness = 0;
+            double coupleMax = 0;
+            double coupleMin = -1;
+            double WMPCMax = 0;
+            double WMPCMin = -1;
+
             double t;
-            
+
             totalCohesionFitness += individual.getFitness().getCohesionBetweenObjectClasses();
-            
+
             totalCouplingFitness += individual.getFitness().getCouplingBetweenObjectClasses();
             if (coupleMax < individual.getFitness().getCohesionBetweenObjectClasses()) {
                 coupleMax = individual.getFitness().getCohesionBetweenObjectClasses();
             }
-            if (coupleMin > individual.getFitness().getCohesionBetweenObjectClasses() || coupleMin == 0) {
+            if (coupleMin > individual.getFitness().getCohesionBetweenObjectClasses() || coupleMin == -1) {
                 coupleMin = individual.getFitness().getCohesionBetweenObjectClasses();
             }
-            
+
             totalWeightedMethodsFitness += individual.getFitness().getWeightedMethodsPerClass();
             if (WMPCMax < individual.getFitness().getWeightedMethodsPerClass()) {
                 WMPCMax = individual.getFitness().getWeightedMethodsPerClass();
             }
-            if (coupleMin > individual.getFitness().getWeightedMethodsPerClass() || coupleMin == 0) {
-                coupleMin = individual.getFitness().getWeightedMethodsPerClass();
+            if (WMPCMin > individual.getFitness().getWeightedMethodsPerClass() || coupleMin == -1) {
+                WMPCMin = individual.getFitness().getWeightedMethodsPerClass();
             }
-            
 
-             // finding the lowest coupled individuals
+            // finding the lowest coupled individuals
             randNum = (double) (Math.random() * totalCouplingFitness);
             chosen = population.get(0);
             t = coupleMax + coupleMin;
@@ -109,18 +110,17 @@ public class GeneticAlgorithm {
             randNum = (double) (Math.random() * totalCohesionFitness);
             chosen = population.get(0);
             for (int i = 0; i < populationSize; i++) {
-                randNum -= population.get(i).getFitness().getCouplingBetweenObjectClasses();
+                randNum -= population.get(i).getFitness().getCohesionBetweenObjectClasses();
                 if (randNum < 0) {
                     chosen = population.get(i);
                 }
             }
             highestCohesiveModels.add(chosen);
-        
-        
-          // finding the most significant distribution 
-            randNum = (double) (Math.random() * totalCohesionFitness);
+
+            // finding the most significant distribution 
+            randNum = (double) (Math.random() * totalWeightedMethodsFitness);
             chosen = population.get(0);
-            t = coupleMax + coupleMin;
+            t = WMPCMax + WMPCMin;
             for (int i = 0; i < populationSize; i++) {
                 randNum -= (t - population.get(i).getFitness().getWeightedMethodsPerClass());
                 if (randNum < 0) {
@@ -136,20 +136,36 @@ public class GeneticAlgorithm {
             bestIndividuals.add(highestCohesiveModels.get(i));
             bestIndividuals.add(bestMethodDistrobutionModels.get(i));
         }
-        while (remainder != 0) {
+        while (true) {
             bestIndividuals.add(lowestCoupledModels.get((int) (Math.random() * populationSize)));
             remainder--;
+            if (remainder == 0){break;}
             bestIndividuals.add(highestCohesiveModels.get((int) (Math.random() * populationSize)));
             remainder--;
+            if (remainder == 0){break;}
             bestIndividuals.add(bestMethodDistrobutionModels.get((int) (Math.random() * populationSize)));
             remainder--;
+            if (remainder == 0){break;}
         }
 
         return bestIndividuals;
     }
 
     // evolution operators
-    private MetaModel mutate(MetaModel model) {
+    private MetaModel mutate(MetaModel model) {      
+        for (Component component : model.chromosome) {
+            if (!(component instanceof DataTypes.Class.Class)) {
+                if ((double) Math.random() <= mutationRate) {
+                    int indexOf = model.chromosome.indexOf(component);
+                    int replacementIndex = 1 + (int) (Math.random() * model.chromosome.size());
+                    while (replacementIndex == indexOf) {
+                        replacementIndex = 1 + (int) (Math.random() * model.chromosome.size());
+                    }
+                    model.chromosome.remove(indexOf);
+                    model.chromosome.add(replacementIndex, component);
+                }
+            }
+        }
         // default random mutation
         return model;
     }
