@@ -83,15 +83,12 @@ public class RelationshipMatrix {
             // get the class the operation belongs to
             if (component instanceof DataTypes.Class.Class) {
                 classee = (DataTypes.Class.Class) component;
-                System.out.println("    class :" + classee.getName());
             }
             // cycle operations for this class and get their parameter types
             if (component instanceof Operation) {
                 Operation operation = (Operation) component;
-                System.out.println("#operation :" + operation.getName());
                 ArrayList<Parameter> parameters = operation.getParameters();
                 for (Parameter parameter : parameters) {
-                    System.out.println("-parameter :" + parameter.getType());
                     // each param that uses another class is a dependency
                     addDependency(classee.getID(), parameter.getType());
                 }
@@ -99,8 +96,6 @@ public class RelationshipMatrix {
             if (component instanceof Attribute) {
                 Attribute attribute = (Attribute) component;
                 if (attribute.getDependency() != null) {
-                    System.out.println("#attribute " + attribute.getName());
-                    System.out.println("-dependency " + attribute.getDependency());
                     addDependency(classee.getID(), attribute.getDependency());
                 }
             }

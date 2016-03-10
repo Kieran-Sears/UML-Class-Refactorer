@@ -9,7 +9,9 @@ import DataTypes.Component;
 import DataTypes.Class.Class;
 import DataTypes.Class.Operation;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 
 /**
  *
@@ -19,25 +21,47 @@ public class FitnessMetrics {
 
     RelationshipMatrix dependencies;
     ArrayList<Component> components;
-    float lackOfCohesion;
-    float couplingBetweenObjectClasses;
-    float weightedMethodsPerClass;
-   // float distanceFromMainSequence;
+    double couplingBetweenObjectClasses;
+    double cohesionBetweenObjectClasses;
+    double weightedMethodsPerClass;
+    // double distanceFromMainSequence;
 
     public FitnessMetrics(RelationshipMatrix dependencies, ArrayList<Component> components) {
         this.dependencies = dependencies;
         this.components = components;
-        lackOfCohesion = lackOfCohesion();
         couplingBetweenObjectClasses = couplingBetweenObjectClasses();
+        cohesionBetweenObjectClasses = cohesionBetweenObjectClasses();
         weightedMethodsPerClass = weightedMethodsPerClass();
-        // distanceFromMainSequence = distanceFromMainSequence();
     }
 
-    private int lackOfCohesion() {
-        return 0;
+    private double cohesionBetweenObjectClasses() {
+         int runningTotal = 0;
+        int numOfClasses = 0;
+        // go through components
+        for (Component component : components) {
+            // isolate the current class
+            if (component instanceof DataTypes.Class.Class) {
+                numOfClasses++;
+                Class classe = (DataTypes.Class.Class) component;
+                Integer classID = dependencies.lookupClass(classe.getID());
+              //  int forDebugging = runningTotal;
+                // find dependencies for the current class
+                for (int i = 0; i < dependencies.associationMatrix.length; i++) {
+                    for (int j = 0; j < dependencies.associationMatrix.length; j++) {
+                        if (i != classID || j != classID) {
+                            if (dependencies.associationMatrix[i][j] == 1) {
+                                runningTotal++;
+                            }
+                        }
+                    }
+                }
+              //  System.out.println("Class " + classe.getName() + " cohesion between classes = " + (runningTotal - forDebugging));
+            }
+        }
+        return runningTotal / numOfClasses;
     }
 
-    private float couplingBetweenObjectClasses() {
+    private double couplingBetweenObjectClasses() {
         int runningTotal = 0;
         int numOfClasses = 0;
         for (Component component : components) {
@@ -61,31 +85,47 @@ public class FitnessMetrics {
         return runningTotal / numOfClasses;
     }
 
-    private float weightedMethodsPerClass() {
+    private double weightedMethodsPerClass() {
+        int totalOperations = 0;
+      
+ 
+        HashMap<Class, Integer> WMPC = new HashMap();
         Iterator<Component> iterator = components.iterator();
-        int nrOfClasses = 0;
-        int nrOfOperations = 0;
+        Class classe = null;
+
         while (iterator.hasNext()) {
             Component next = iterator.next();
             if (next instanceof Class) {
-                nrOfClasses++;
+                classe = (Class) next;
+                WMPC.put(classe, 0);          
             }
             if (next instanceof Operation) {
-                nrOfOperations++;
+                totalOperations++;
+                if (WMPC.containsKey(classe)) {
+                    Integer get = WMPC.get(classe);
+                    get++;
+                    WMPC.put(classe, get);
+                } else {
+                    System.out.println("no class for this operation, check a class is first component in chromosome");
+                }
             }
         }
-        if (nrOfClasses == 0) {
-            throw new IllegalArgumentException("Argument 'nrOfClasses' is 0");
-        } else {
-            return nrOfOperations / nrOfClasses;
+
+        int nrOfClasses = WMPC.size();
+        double average = totalOperations / nrOfClasses;
+        double total = 0;
+        Iterator<Integer> iterator1 = WMPC.values().iterator();
+        while (iterator1.hasNext()) {
+            Integer next = iterator1.next();
+            total += ((next - average) * (next - average)) / average;
         }
+
+
+        // dof = nrOfClasses -1
+        return new ChiSquaredDistribution(nrOfClasses - 1).cumulativeProbability(total);
     }
 
-    private void cohesionOfMethods() {
-
-    }
-
-//    public float distanceFromMainSequence(ArrayList<Component> components, RelationshipMatrix dependencies) {
+//    public double distanceFromMainSequence(ArrayList<Component> components, RelationshipMatrix dependencies) {
 //
 ////    D = (A + I − 1) / √2 
 ////  Where:
@@ -131,12 +171,22 @@ public class FitnessMetrics {
 //        }
 //        return ((abstractClasses / totalClasses) + (efferentCoupling / (efferentCoupling + afferentCoupling))) / Math.sqrt(2);
 //    }
+    public double getCouplingBetweenObjectClasses() {
+        return couplingBetweenObjectClasses;
+    }
+
+    public double getWeightedMethodsPerClass() {
+        return weightedMethodsPerClass;
+    }
+
+    public double getCohesionBetweenObjectClasses() {
+        return cohesionBetweenObjectClasses;
+    }
+
     @Override
     public String toString() {
-        return " \nLackOfCohesion=" + lackOfCohesion
-                + ", \nCouplingBetweenObjectClasses=" + couplingBetweenObjectClasses
+        return "\nCouplingBetweenObjectClasses=" + couplingBetweenObjectClasses
                 + ", \nWeightedMethodsPerClass=" + weightedMethodsPerClass
-                // + ", \ndistanceFromMainSequence=" + distanceFromMainSequence
                 + ",}\n\n";
     }
 

@@ -28,6 +28,7 @@ public class MetaModel {
         dependencies = new RelationshipMatrix(chromosome, associations);
         chromosome = dependencies.changeAssociationsToAttributes(chromosome, associations);
         dependencies.sortMethodDependencies(chromosome);
+        System.out.println(dependencies.toString());
         fitness = new FitnessMetrics(dependencies, chromosome);
     }
     
@@ -36,9 +37,17 @@ public class MetaModel {
      fitness = new FitnessMetrics(dependencies, chromosome);
     }
     
-  
+    
+    
+    public FitnessMetrics getFitness() {    
+        return fitness;
+    }
 
     // getters and setters
+    public void setFitness(FitnessMetrics fitness) {
+        this.fitness = fitness;
+    }
+
     public ArrayList<Component> getComponents() {
         return chromosome;
     }
