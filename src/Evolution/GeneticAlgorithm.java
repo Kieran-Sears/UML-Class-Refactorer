@@ -14,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -139,34 +140,55 @@ public class GeneticAlgorithm {
         while (true) {
             bestIndividuals.add(lowestCoupledModels.get((int) (Math.random() * populationSize)));
             remainder--;
-            if (remainder == 0){break;}
+            if (remainder == 0) {
+                break;
+            }
             bestIndividuals.add(highestCohesiveModels.get((int) (Math.random() * populationSize)));
             remainder--;
-            if (remainder == 0){break;}
+            if (remainder == 0) {
+                break;
+            }
             bestIndividuals.add(bestMethodDistrobutionModels.get((int) (Math.random() * populationSize)));
             remainder--;
-            if (remainder == 0){break;}
+            if (remainder == 0) {
+                break;
+            }
         }
 
         return bestIndividuals;
     }
 
     // evolution operators
-    private MetaModel mutate(MetaModel model) {      
-        for (Component component : model.chromosome) {
+    private MetaModel mutate(MetaModel model) {
+
+        HashMap<Integer, Integer> indexes = new HashMap();
+        ArrayList<Component> chromosome = model.getChromosome();
+
+        for (Component component : chromosome) {
             if (!(component instanceof DataTypes.Class.Class)) {
-                if ((double) Math.random() <= mutationRate) {
-                    int indexOf = model.chromosome.indexOf(component);
-                    int replacementIndex = 1 + (int) (Math.random() * model.chromosome.size());
+                double random = (double) Math.random();
+                if (random <= mutationRate) {
+                    int indexOf = chromosome.indexOf(component);
+                    int replacementIndex = 1 + (int) (Math.random() * chromosome.size() - 1);
                     while (replacementIndex == indexOf) {
-                        replacementIndex = 1 + (int) (Math.random() * model.chromosome.size());
+                        replacementIndex = 1 + (int) (Math.random() * chromosome.size() - 1);
                     }
-                    model.chromosome.remove(indexOf);
-                    model.chromosome.add(replacementIndex, component);
+                    indexes.put(indexOf, replacementIndex);
                 }
             }
         }
-        // default random mutation
+        Iterator<Map.Entry<Integer, Integer>> iterator = indexes.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, Integer> next = iterator.next();
+            Component get = chromosome.get(next.getKey());
+            chromosome.remove(get);
+            if (next.getKey() < next.getValue()) {
+                chromosome.add(next.getValue() - 1, get);
+            } else {
+                chromosome.add(next.getValue(), get);
+            }
+        }
+        //model.setChromosome(copy);
         return model;
     }
 

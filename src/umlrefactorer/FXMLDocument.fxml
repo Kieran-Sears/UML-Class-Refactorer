@@ -1,26 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.web.*?>
+<?import javafx.scene.chart.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="200" prefWidth="320" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="umlrefactorer.FXMLDocumentController">
-    <children>
-        <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
-      <VBox layoutX="15.0" prefHeight="200.0" prefWidth="290.0">
-         <children>
-              <Button fx:id="button" onAction="#handleButtonAction" text="Evolve" />
-            <Label text="Population Size" />
-            <TextField fx:id="populationSize" text="1" />
-            <Label text="Number Of Generations" />
-            <TextField fx:id="numOfGenerations" text="1" />
-            <Label text="Mutation Rate" />
-            <TextField fx:id="mutationRate" text="0.05" />
-            <Label text="Crossover Rate" />
-            <TextField fx:id="crossoverRate" text="0" />
-         </children>
-      </VBox>
-    </children>
-</AnchorPane>
+
+<Pane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="umlrefactorer.FXMLDocumentController">
+   <children>
+      <ScrollPane layoutY="25.0" prefHeight="653.0" prefWidth="1065.0">
+         <content>
+            <TabPane prefHeight="676.0" prefWidth="1064.0">
+               <tabs>
+                  <Tab text="Fitness Overview">
+                     <content>
+                        <AnchorPane id="AnchorPane" prefHeight="628.0" prefWidth="887.0">
+                            <children>
+                                <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
+                              <VBox layoutX="16.0" layoutY="14.0" prefHeight="200.0" prefWidth="148.0">
+                                 <children>
+                                    <HBox prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                            <Button fx:id="button" onAction="#handleButtonAction" text="Evolve" />
+                                          <Button mnemonicParsing="false" text="Reset" />
+                                       </children>
+                                    </HBox>
+                                    <Label text="Population Size" />
+                                    <TextField fx:id="populationSize" text="1" />
+                                    <Label text="Number Of Generations" />
+                                    <TextField fx:id="numOfGenerations" text="1" />
+                                    <Label text="Mutation Rate" />
+                                    <TextField fx:id="mutationRate" text="0.05" />
+                                    <Label text="Crossover Rate" />
+                                    <TextField fx:id="crossoverRate" text="0" />
+                                 </children>
+                              </VBox>
+                              <StackedBarChart fx:id="chart" layoutX="201.0" layoutY="26.0" prefHeight="591.0" prefWidth="841.0">
+                                <xAxis>
+                                  <CategoryAxis side="BOTTOM" />
+                                </xAxis>
+                                <yAxis>
+                                  <NumberAxis side="LEFT" />
+                                </yAxis>
+                              </StackedBarChart>
+                            </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+                  <Tab text="Distance From Pattern">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <VBox layoutX="14.0" layoutY="14.0" prefHeight="604.0" prefWidth="180.0" />
+                              <WebView layoutX="267.0" layoutY="46.0" prefHeight="560.0" prefWidth="764.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
+               </tabs>
+            </TabPane>
+         </content>
+      </ScrollPane>
+      <MenuBar layoutY="2.0" prefHeight="25.0" prefWidth="1065.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem fx:id="loadFile" mnemonicParsing="false" text="Load" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </children>
+</Pane>
