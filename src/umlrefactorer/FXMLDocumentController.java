@@ -18,10 +18,10 @@ import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
-import umlrefactorer.DesignPatternsController;
-import umlrefactorer.EvolutionController;
-import umlrefactorer.ParserController;
 import view.ModelViewer;
 
 /**
@@ -41,6 +41,8 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private Button generateButton;
+    @FXML
+    AnchorPane displayPane;
     @FXML
     StackedBarChart<String, Number> chart;
     @FXML
@@ -75,11 +77,18 @@ public class FXMLDocumentController implements Initializable {
         ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation();
         for (MetaModel metaModel : evolvePopulation) {
             updateChart(metaModel);
+            File view = viewer.generateModelView(metaModel);
+            WebView webview = new WebView();  // the thumbnail preview of the artefact in cell
+            WebEngine engine = webview.getEngine();
+            engine.setJavaScriptEnabled(true);
+            engine.load("File:///" + view.getAbsolutePath());
+            displayPane.getChildren().add(webview);
         }
         generateButton.setText("Next Generation");
         generateButton.setOnAction((event) -> {
             iterate();
         });
+
     }
 
     public void iterate() {
@@ -89,6 +98,12 @@ public class FXMLDocumentController implements Initializable {
             patterns.scanForAntiPatterns(original);
             patterns.scanForPatterns(original);
             updateChart(metaModel);
+            File view = viewer.generateModelView(metaModel);
+            WebView webview = new WebView();  // the thumbnail preview of the artefact in cell
+            WebEngine engine = webview.getEngine();
+            engine.setJavaScriptEnabled(true);
+            engine.load("File:///" + view.getAbsolutePath());
+            displayPane.getChildren().add(webview);
         }
     }
 
@@ -115,7 +130,12 @@ public class FXMLDocumentController implements Initializable {
             patterns.scanForPatterns(model);
             updateChart(model);
             original = model;
-            viewer.generateModelView(model);
+            File view = viewer.generateModelView(model);
+            WebView webview = new WebView();  // the thumbnail preview of the artefact in cell
+            WebEngine engine = webview.getEngine();
+            engine.setJavaScriptEnabled(true);
+            engine.load("File:///" + view.getAbsolutePath());
+            displayPane.getChildren().add(webview);
         } catch (IllegalArgumentException e) {
             System.out.println("user cancelled loading file");
         }

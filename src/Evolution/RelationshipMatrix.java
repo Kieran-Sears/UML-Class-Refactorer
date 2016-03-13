@@ -78,6 +78,7 @@ public class RelationshipMatrix {
     }
     
     public void sortMethodDependencies(ArrayList<CoreComponent> components) {
+        
         // add method dependencies
         DataTypes.Class.Class classee = null;
         for (Component component : components) {

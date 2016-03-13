@@ -8,16 +8,10 @@ package Evolution;
 import DataTypes.Component;
 import DataTypes.CoreComponent;
 import DesignPatterns.MutationHeuristic;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -38,14 +32,14 @@ public class GeneticAlgorithm {
         population.add(model);
 
         for (int i = 1; i < populationSize; i++) {
-            MetaModel crossedAndMutated = mutate(model);
-            crossedAndMutated.updateDependenciesAndFitness();
-            population.add(crossedAndMutated);
+            MetaModel mutated = mutate(model);
+            mutated.updateDependenciesAndFitness();
+            population.add(mutated);
         }
     }
 
     public void evolvePopulation() {
-        selection(population);
+        selection();
         for (MetaModel model : population) {
             MetaModel crossedAndMutated = mutate(model);
             crossedAndMutated.dependencies.sortMethodDependencies(crossedAndMutated.chromosome);
@@ -53,7 +47,7 @@ public class GeneticAlgorithm {
         }
     }
 
-    public ArrayList<MetaModel> selection(ArrayList<MetaModel> population) {
+    public ArrayList<MetaModel> selection() {
         double randNum;
         int remainder = populationSize % 3;
         int divisor = populationSize - remainder;
@@ -227,4 +221,10 @@ public class GeneticAlgorithm {
         this.population = population;
     }  
 // end of getters and setters
+    
+    public void printPopulationDependencies(){
+        for (MetaModel pop : population) {
+            System.out.println( pop.getDependencies().toString());
+        }
+    }
 }

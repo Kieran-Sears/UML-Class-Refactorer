@@ -21,10 +21,12 @@ public class EvolutionController {
     public void initialiseGA(MetaModel mm, int populationSize, float mutationRate, float crossoverRate) {
         GA = new GeneticAlgorithm();
         GA.initialiseGA(mm, populationSize, mutationRate, crossoverRate);
+        GA.printPopulationDependencies();
     }
 
     public ArrayList<MetaModel> evolvePopulation() {
             GA.evolvePopulation();
+            GA.printPopulationDependencies();
             return GA.getPopulation();
     }
 

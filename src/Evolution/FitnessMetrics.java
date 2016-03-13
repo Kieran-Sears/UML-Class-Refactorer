@@ -106,7 +106,7 @@ public class FitnessMetrics {
                         }
                     }
                 }
-                System.out.println("Class " + classe.getName() + " coupling between classes = " + (runningTotal - forDebugging));
+                //System.out.println("Class " + classe.getName() + " coupling between classes = " + (runningTotal - forDebugging));
             }
         }
         return runningTotal / numOfClasses;
@@ -133,7 +133,7 @@ public class FitnessMetrics {
                     get++;
                     WMPC.put(classe, get);
                 } else {
-                    System.out.println("no class for this operation, check a class is first component in chromosome");
+                  //  System.out.println("no class for this operation, check a class is first component in chromosome");
                 }
             }
         }
