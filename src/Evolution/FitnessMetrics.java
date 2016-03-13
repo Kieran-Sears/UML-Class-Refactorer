@@ -8,6 +8,7 @@ package Evolution;
 import DataTypes.Component;
 import DataTypes.Class.Class;
 import DataTypes.Class.Operation;
+import DataTypes.CoreComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,13 +21,13 @@ import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 public class FitnessMetrics {
 
     RelationshipMatrix dependencies;
-    ArrayList<Component> components;
+    ArrayList<CoreComponent> components;
     double couplingBetweenObjectClasses;
     double cohesionBetweenObjectClasses;
     double weightedMethodsPerClass;
     // double distanceFromMainSequence;
 
-    public FitnessMetrics(RelationshipMatrix dependencies, ArrayList<Component> components) {
+    public FitnessMetrics(RelationshipMatrix dependencies, ArrayList<CoreComponent> components) {
         this.dependencies = dependencies;
         this.components = components;
         couplingBetweenObjectClasses = couplingBetweenObjectClasses();
@@ -35,6 +36,32 @@ public class FitnessMetrics {
     }
 
     private double cohesionBetweenObjectClasses() {
+        
+        /*
+            int numUses[][] = new int[highestClasses + 1][highestClasses + 1];
+        //2.2 loop through each class
+        classesPresent.stream().forEach((thisClass) -> {
+            //get all the methods in this class
+            ArrayList<String> methodsInthisClass = classMethodsMap.get(thisClass);
+            if (methodsInthisClass != null) {
+                //2.3 foreach methid in the class
+                methodsInthisClass.stream().forEach((thisMethod) -> {
+                    //get all of the attributes it uses
+                    ArrayList<String> thisMethodAtts = UsesMap.get(thisMethod);
+                    thisMethodAtts.stream().map((attrString) -> {
+                        //and then what class they are in
+                        int attClass = classAssignments.get(attrString);
+                        System.out.println("dealing with method " + thisMethod + "in class " + thisClass + ": it uses attribute " + attrString + " which is is class " + attClass + "\n");
+                        return attClass;
+                    }).forEach((attClass) -> {
+                        //2.5 finally increment the numberof uses
+                        numUses[thisClass][attClass]++;
+                    });
+                });
+            }
+        });
+        */
+        
          int runningTotal = 0;
         int numOfClasses = 0;
         // go through components
@@ -90,7 +117,7 @@ public class FitnessMetrics {
       
  
         HashMap<Class, Integer> WMPC = new HashMap();
-        Iterator<Component> iterator = components.iterator();
+        Iterator<CoreComponent> iterator = components.iterator();
         Class classe = null;
 
         while (iterator.hasNext()) {

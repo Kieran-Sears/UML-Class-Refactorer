@@ -9,6 +9,7 @@ import DataTypes.Class.Attribute;
 import DataTypes.Class.Operation;
 import DataTypes.Class.Parameter;
 import DataTypes.Component;
+import DataTypes.CoreComponent;
 import Evolution.MetaModel;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class Blob extends AntiPattern implements AntiPatternAnalyser {
      e.g. Print_Item, Delete_Item.
      */
     public HashMap<Operation, Attribute> identifyContracts() {
-        ArrayList<Component> components = model.getComponents();
+        ArrayList<CoreComponent> components = model.getComponents();
         HashMap<Operation, Attribute> contracts = new HashMap();
         for (Component component : components) {
             if (component instanceof Operation) {

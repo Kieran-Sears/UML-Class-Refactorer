@@ -5,21 +5,24 @@
  */
 package umlrefactorer;
 
-import Evolution.FitnessMetrics;
 import Evolution.MetaModel;
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import umlrefactorer.DesignPatternsController;
+import umlrefactorer.EvolutionController;
+import umlrefactorer.ParserController;
+import view.ModelViewer;
 
 /**
  *
@@ -30,16 +33,14 @@ public class FXMLDocumentController implements Initializable {
     ParserController parser;
     EvolutionController evolution;
     DesignPatternsController patterns;
+    ModelViewer viewer;
     int generation = 0;
+    MetaModel original;
 
-    ObservableList<XYChart.Series<String, Number>> cohesionFitness;
-    ObservableList<XYChart.Series<String, Number>> couplingFitness;
-    ObservableList<XYChart.Series<String, Number>> methodDistrobutionFitness;
+    ObservableList<XYChart.Series<String, Number>> stackBarChartData;
 
-    XYChart.Series<String, Number> cohesionScores;
-    XYChart.Series<String, Number> couplingScores;
-    XYChart.Series<String, Number> methodDistrobutionScores;
-
+    @FXML
+    private Button generateButton;
     @FXML
     StackedBarChart<String, Number> chart;
     @FXML
@@ -49,55 +50,75 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private TextField crossoverRate;
 
-    @FXML
-    private void handleButtonAction(ActionEvent event) {
-        File file = new File("C:\\Users\\Kieran\\Documents\\NetBeansProjects\\UMLRefactorer\\src/Parser/bookshopCaseScenario.xmi");
-        MetaModel model = parser.extractModelFromXMI(file);
-        // model.printModelToConsole(); // for debugging
-        // TODO Handle Invalid Input
-        int popSize = Integer.parseInt(populationSize.getText());
-        float mutRate = Float.parseFloat(mutationRate.getText());
-        float crossRate = Float.parseFloat(crossoverRate.getText());
-        patterns.scanForAntiPatterns(model);
-        patterns.scanForPatterns(model);
-        evolution.initialiseGA(model, popSize, mutRate, crossRate);
-        updateChart(evolution.evolvePopulation());
-
-    }
-
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        cohesionScores = new XYChart.Series<>();
-        cohesionScores.setName("Cohesion");
-        couplingScores = new XYChart.Series<>();
-        couplingScores.setName("Coupling");
-        methodDistrobutionScores = new XYChart.Series<>();
-        methodDistrobutionScores.setName("Method\nDistribution");
-
+        stackBarChartData = FXCollections.observableArrayList();
         parser = new ParserController();
         evolution = new EvolutionController();
         patterns = new DesignPatternsController();
+        viewer = new ModelViewer();
+        generateButton.setText("Generate Population");
+        generateButton.setOnAction((event) -> {
+            initialiseGA();
+        });
     }
 
-    public void updateChart(HashMap<String, Object> results) {
-        ObservableList<XYChart.Series<String, Number>> stackBarChartData = FXCollections.observableArrayList();
-        StackedBarChart.Series<String, Number> series = new StackedBarChart.Series<>();
-        series.setName(Integer.toString(generation));
-        series.getData().add(new XYChart.Data<>("Cohesion", ((FitnessMetrics) results.get("fitness")).getCohesionBetweenObjectClasses()));
-        series.getData().add(new XYChart.Data<>("Coupling", ((FitnessMetrics) results.get("fitness")).getCouplingBetweenObjectClasses()));
-        series.getData().add(new XYChart.Data<>("Methods\nDistrobution", ((FitnessMetrics) results.get("fitness")).getWeightedMethodsPerClass()));
-        stackBarChartData.addAll(series);
+    @FXML
+    private void initialiseGA() {
+        stackBarChartData = FXCollections.observableArrayList();
+        int popSize = Integer.parseInt(populationSize.getText());
+        float mutRate = Float.parseFloat(mutationRate.getText());
+        float crossRate = Float.parseFloat(crossoverRate.getText());
+        patterns.scanForAntiPatterns(original);
+        patterns.scanForPatterns(original);
+        evolution.initialiseGA(original, popSize, mutRate, crossRate);
+        ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation();
+        for (MetaModel metaModel : evolvePopulation) {
+            updateChart(metaModel);
+        }
+        generateButton.setText("Next Generation");
+        generateButton.setOnAction((event) -> {
+            iterate();
+        });
+    }
+
+    public void iterate() {
+        stackBarChartData = FXCollections.observableArrayList();
+        ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation();
+        for (MetaModel metaModel : evolvePopulation) {
+            patterns.scanForAntiPatterns(original);
+            patterns.scanForPatterns(original);
+            updateChart(metaModel);
+        }
+    }
+
+    public void updateChart(MetaModel model) {
+        StackedBarChart.Series<String, Number> modelResults = new StackedBarChart.Series<>();
+        modelResults.setName(Integer.toString(generation));
+        modelResults.getData().add(new XYChart.Data<>("Cohesion", model.getFitness().getCohesionBetweenObjectClasses()));
+        modelResults.getData().add(new XYChart.Data<>("Coupling", model.getFitness().getCouplingBetweenObjectClasses()));
+        modelResults.getData().add(new XYChart.Data<>("Methods\nDistrobution", model.getFitness().getWeightedMethodsPerClass()));
+        stackBarChartData.addAll(modelResults);
         chart.setData(stackBarChartData);
     }
 
-    public void loadFile(){
-//     DirectoryChooser dc = new DirectoryChooser();
-//      File file = dc.showDialog(null);
-//       MetaModel model = parser.extractModelFromXMI(file);
-//        patterns.scanForAntiPatterns(model);
-//        patterns.scanForPatterns(model);
-//        evolution.initialiseGA(model, popSize, mutRate, crossRate);
-//        updateChart(evolution.evolvePopulation());
+    public void loadFile() {
+        FileChooser fc = new FileChooser();
+        File developerFastFindFile = new File("C:\\Users\\Kieran\\Documents\\NetBeansProjects\\UMLRefactorer\\src\\Parser");
+        if (developerFastFindFile.exists()) {
+            fc.setInitialDirectory(developerFastFindFile);
+        }
+        try {
+            File file = fc.showOpenDialog(null);
+            MetaModel model = parser.extractModelFromXMI(file);
+            patterns.scanForAntiPatterns(model);
+            patterns.scanForPatterns(model);
+            updateChart(model);
+            original = model;
+            viewer.generateModelView(model);
+        } catch (IllegalArgumentException e) {
+            System.out.println("user cancelled loading file");
+        }
     }
-    
+
 }

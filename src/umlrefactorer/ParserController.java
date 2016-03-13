@@ -21,7 +21,9 @@ public class ParserController {
     
     public MetaModel extractModelFromXMI(File file){
     parser = new XMI_Parser(file);
-        return parser.getModel();
+        MetaModel model = parser.getModel();
+        model.initialiseDependenciesAndFitness();
+        return model;
     }
     
 }

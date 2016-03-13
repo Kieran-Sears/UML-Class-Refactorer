@@ -5,24 +5,18 @@
  */
 package DataTypes.Class;
 
-import DataTypes.Component;
+import DataTypes.CoreComponent;
 
 /**
  *
  * @author Kieran
  */
-public class Attribute extends Component {
+public class Attribute extends CoreComponent {
  
-    private String name;
+ 
     private String dependency;
     
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+ 
 
     public String getDependency() {
         return dependency;
@@ -34,7 +28,7 @@ public class Attribute extends Component {
     
     @Override
     public String toString() {
-        return "Attribute{" + "\nname=" + name + "\ndependency=" + dependency + "}\n\n";
+        return "Attribute{" + "\nname=" + this.getName() + "\ndependency=" + dependency + "}\n\n";
     }
 
  

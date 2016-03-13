@@ -5,7 +5,8 @@
  */
 package DataTypes.Class;
 
-import DataTypes.Component;
+
+import DataTypes.CoreComponent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -13,20 +14,12 @@ import java.util.Iterator;
  *
  * @author Kieran
  */
-public class Operation extends Component  {
+public class Operation extends CoreComponent  {
  
-    private String name;
+
     private ArrayList<Parameter> parameters;
 
   
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public ArrayList<Parameter> getParameters() {
         return parameters;
@@ -38,7 +31,7 @@ public class Operation extends Component  {
 
     @Override
     public String toString() {
-        String string = "\nOperation:" + "\n name=" + name  + "\n";
+        String string = "\nOperation:" + "\n name=" + this.getName()  + "\n";
         Iterator<Parameter> iterator = parameters.iterator();
         while (iterator.hasNext()) {
             Parameter next = iterator.next();

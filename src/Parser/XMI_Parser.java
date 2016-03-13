@@ -12,6 +12,7 @@ import DataTypes.Class.Operation;
 import DataTypes.Class.Association;
 import DataTypes.Class.Attribute;
 import DataTypes.Component;
+import DataTypes.CoreComponent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,8 +79,8 @@ public class XMI_Parser extends Parser {
         return null;
     }
 
-    public ArrayList<Component> extractComponents() {
-        ArrayList<Component> componentArray = new ArrayList();
+    public ArrayList<CoreComponent> extractComponents() {
+        ArrayList<CoreComponent> componentArray = new ArrayList();
         try {
             expr = xpath.compile("//packagedElement[@xmi:type='uml:Class']");
             NodeList classes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);

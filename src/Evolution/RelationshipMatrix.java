@@ -11,6 +11,7 @@ import DataTypes.Class.Class;
 import DataTypes.Class.Operation;
 import DataTypes.Class.Parameter;
 import DataTypes.Component;
+import DataTypes.CoreComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -25,7 +26,7 @@ public class RelationshipMatrix {
     private final HashMap<String, Integer> lookupTable = new HashMap();
     public int[][] associationMatrix;
 
-    public RelationshipMatrix(ArrayList<Component> components, ArrayList<Association> associations) {
+    public RelationshipMatrix(ArrayList<CoreComponent> components, ArrayList<Association> associations) {
 
         // get number of classes for matrix
         ArrayList<Class> classes = new ArrayList();
@@ -48,7 +49,7 @@ public class RelationshipMatrix {
         }
     }
 
-    public ArrayList<Component> changeAssociationsToAttributes(ArrayList<Component> components, ArrayList<Association> associations){
+    public ArrayList<CoreComponent> changeAssociationsToAttributes(ArrayList<CoreComponent> components, ArrayList<Association> associations){
       // turn aggregations and compositions into dependencies
         for (Association association : associations) {
             // assuming all associations are attribute "collections of objects"
@@ -76,7 +77,7 @@ public class RelationshipMatrix {
         return components;
     }
     
-    public void sortMethodDependencies(ArrayList<Component> components) {
+    public void sortMethodDependencies(ArrayList<CoreComponent> components) {
         // add method dependencies
         DataTypes.Class.Class classee = null;
         for (Component component : components) {
@@ -116,6 +117,12 @@ public class RelationshipMatrix {
         return lookupTable.get(id);
     }
 
+    public int[][] getAssociationMatrix() {
+        return associationMatrix;
+    }
+
+    
+    
     @Override
     public String toString() {
         String string = "\nDependencyMatrix=\n";

@@ -7,7 +7,14 @@ package Evolution;
 
 import DataTypes.Class.Association;
 import DataTypes.Component;
+import DataTypes.CoreComponent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -20,7 +27,7 @@ public class MetaModel {
     // shows connections between classes
     RelationshipMatrix dependencies;
     // holds all the methods attributes and classes
-    ArrayList<Component> chromosome;
+    ArrayList<CoreComponent> chromosome;
     // a list of associations present (composition, aggregation, generalisation etc)
     ArrayList<Association> associations;
 
@@ -48,11 +55,11 @@ public class MetaModel {
         this.fitness = fitness;
     }
 
-    public ArrayList<Component> getComponents() {
+    public ArrayList<CoreComponent> getComponents() {
         return chromosome;
     }
 
-    public void setComponents(ArrayList<Component> components) {
+    public void setComponents(ArrayList<CoreComponent> components) {
         this.chromosome = components;
     }
 
@@ -72,14 +79,34 @@ public class MetaModel {
     public void setDependencies(RelationshipMatrix dependencies) {
         this.dependencies = dependencies;
     }
-
-    public ArrayList<Component> getChromosome() {
-        return chromosome;
+    
+     // Printing results out
+    public void outputResultsToFile(File file) {
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter(file, "UTF-8");
+                writer.println(chromosome.toString());
+                writer.println(dependencies.toString());
+                writer.println(fitness.toString());
+                writer.println("\n##################################\n");
+            
+            writer.close();
+        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+            Logger.getLogger(GeneticAlgorithm.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            writer.close();
+        }
     }
 
-    public void setChromosome(ArrayList<Component> chromosome) {
-        this.chromosome = chromosome;
+    public void outputResultsToConsole() {
+        String string = "";
+            string += "\n''''''''''''''''''''''''''''''\n";
+            string += chromosome.toString();
+            string += dependencies.toString();
+            string += fitness.toString();
+        System.out.println(string);
     }
-    
-    
+
+  
+    // end of printing
 }

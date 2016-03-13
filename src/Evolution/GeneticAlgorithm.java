@@ -6,6 +6,7 @@
 package Evolution;
 
 import DataTypes.Component;
+import DataTypes.CoreComponent;
 import DesignPatterns.MutationHeuristic;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,7 +26,7 @@ import java.util.logging.Logger;
 public class GeneticAlgorithm {
 
     // attributes
-    private final ArrayList<MetaModel> population = new ArrayList();
+    private ArrayList<MetaModel> population = new ArrayList();
     private int populationSize;
     private double mutationRate;
     private double crossoverRate;
@@ -34,12 +35,11 @@ public class GeneticAlgorithm {
         this.populationSize = populationSize;
         this.mutationRate = mutationRate;
         this.crossoverRate = crossoverRate;
-        model.initialiseDependenciesAndFitness();
         population.add(model);
 
         for (int i = 1; i < populationSize; i++) {
             MetaModel crossedAndMutated = mutate(model);
-            model.updateDependenciesAndFitness();
+            crossedAndMutated.updateDependenciesAndFitness();
             population.add(crossedAndMutated);
         }
     }
@@ -162,7 +162,7 @@ public class GeneticAlgorithm {
     private MetaModel mutate(MetaModel model) {
 
         HashMap<Integer, Integer> indexes = new HashMap();
-        ArrayList<Component> chromosome = model.getChromosome();
+        ArrayList<CoreComponent> chromosome = model.getComponents();
 
         for (Component component : chromosome) {
             if (!(component instanceof DataTypes.Class.Class)) {
@@ -180,7 +180,7 @@ public class GeneticAlgorithm {
         Iterator<Map.Entry<Integer, Integer>> iterator = indexes.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Integer, Integer> next = iterator.next();
-            Component get = chromosome.get(next.getKey());
+            CoreComponent get = chromosome.get(next.getKey());
             chromosome.remove(get);
             if (next.getKey() < next.getValue()) {
                 chromosome.add(next.getValue() - 1, get);
@@ -200,51 +200,7 @@ public class GeneticAlgorithm {
     }
 
     // end of evolution operators
-    // Printing results out
-    public void outputResultsToFile(File file) {
-        PrintWriter writer = null;
-        try {
-            writer = new PrintWriter(file, "UTF-8");
-            Iterator<MetaModel> iterator = population.iterator();
-            while (iterator.hasNext()) {
-                writer.println(iterator.next().chromosome.toString());
-                writer.println(iterator.next().dependencies.toString());
-                writer.println(iterator.next().fitness.toString());
-                writer.println("\n##################################\n");
-            }
-            writer.close();
-        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-            Logger.getLogger(GeneticAlgorithm.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            writer.close();
-        }
-    }
-
-    public void outputResultsToConsole() {
-        String string = "";
-        Iterator<MetaModel> iterator = population.iterator();
-        while (iterator.hasNext()) {
-            MetaModel next = iterator.next();
-            string += "\n''''''''''''''''''''''''''''''\n";
-            string += next.chromosome.toString();
-            string += next.dependencies.toString();
-            string += next.fitness.toString();
-        }
-        System.out.println(string);
-    }
-
-    public HashMap<String, Object> returnResultsAsHashmap() {
-        HashMap<String, Object> HM = new HashMap();
-        Iterator<MetaModel> iterator = population.iterator();
-        while (iterator.hasNext()) {
-            MetaModel next = iterator.next();
-            HM.put("components", next.chromosome);
-            HM.put("dependencies", next.dependencies);
-            HM.put("fitness", next.fitness);
-        }
-        return HM;
-    }
-    // end of printing
+   
 
     // getters and setters
     public double getMutationRate() {
@@ -262,5 +218,13 @@ public class GeneticAlgorithm {
     public void setCrossoverRate(double crossoverRate) {
         this.crossoverRate = crossoverRate;
     }
-    // end of getters and setters
+
+    public ArrayList<MetaModel> getPopulation() {
+        return population;
+    }
+
+    public void setPopulation(ArrayList<MetaModel> population) {
+        this.population = population;
+    }  
+// end of getters and setters
 }

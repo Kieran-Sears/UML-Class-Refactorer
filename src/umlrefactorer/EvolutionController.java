@@ -7,7 +7,8 @@ package umlrefactorer;
 
 import Evolution.MetaModel;
 import Evolution.GeneticAlgorithm;
-import java.util.HashMap;
+import java.util.ArrayList;
+
 
 /**
  *
@@ -22,10 +23,10 @@ public class EvolutionController {
         GA.initialiseGA(mm, populationSize, mutationRate, crossoverRate);
     }
 
-    public HashMap<String, Object> evolvePopulation() {
+    public ArrayList<MetaModel> evolvePopulation() {
             GA.evolvePopulation();
-            // GA.outputResultsToConsole();
-        return  GA.returnResultsAsHashmap();
+            return GA.getPopulation();
     }
 
+  
 }
