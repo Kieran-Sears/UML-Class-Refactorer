@@ -139,17 +139,25 @@ public class FitnessMetrics {
         }
 
         int nrOfClasses = WMPC.size();
-        double average = totalOperations / nrOfClasses;
+        System.out.println("totalOperations " + totalOperations);
+        System.out.println("nrOfClasses " + nrOfClasses);
+        double average = ((double) totalOperations) / ((double) nrOfClasses);
         double total = 0;
         Iterator<Integer> iterator1 = WMPC.values().iterator();
         while (iterator1.hasNext()) {
             Integer next = iterator1.next();
+            // sum of observed value for number of methods in each class vs. expected value (our average)
             total += ((next - average) * (next - average)) / average;
         }
-
-
-        // dof = nrOfClasses -1
-        return new ChiSquaredDistribution(nrOfClasses - 1).cumulativeProbability(total);
+        System.out.println("average " + average);
+        System.out.println("total " + total);
+        // degrees of freedom = number of classes minus 1
+        ChiSquaredDistribution chi =  new ChiSquaredDistribution(nrOfClasses - 1);
+        double cumulativeProbability = 1 - chi.cumulativeProbability(total);
+     
+        System.out.println("cumulativeProbability " + cumulativeProbability);
+    
+        return cumulativeProbability;
     }
 
 //    public double distanceFromMainSequence(ArrayList<Component> components, RelationshipMatrix dependencies) {

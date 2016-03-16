@@ -79,6 +79,26 @@ public class RelationshipMatrix {
     
     public void sortMethodDependencies(ArrayList<CoreComponent> components) {
         
+        // get number of classes for matrix
+        ArrayList<Class> classes = new ArrayList();
+        for (Component component : components) {
+            if (component instanceof Class) {
+                classes.add((Class) component);
+            }
+        }
+
+        // initialise matrix and add dependencies
+        this.associationMatrix = new int[classes.size()][classes.size()];
+        int classCounter = 0;
+        for (Class classe : classes) {
+            lookupTable.put(classe.getID(), classCounter);
+            reverseLookupTable.put(classCounter, classe.getName());
+            for (int j = 0; j < associationMatrix.length; j++) {
+                associationMatrix[classCounter][j] = 0;
+            }
+            classCounter++;
+        }
+        
         // add method dependencies
         DataTypes.Class.Class classee = null;
         for (Component component : components) {
