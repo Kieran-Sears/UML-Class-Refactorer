@@ -11,7 +11,6 @@ import DataTypes.Class.Parameter;
 import DataTypes.Class.Operation;
 import DataTypes.Class.Association;
 import DataTypes.Class.Attribute;
-import DataTypes.Component;
 import DataTypes.CoreComponent;
 import java.io.File;
 import java.io.IOException;

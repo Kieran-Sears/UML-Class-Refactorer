@@ -6,7 +6,6 @@
 package Evolution;
 
 import DataTypes.Class.Association;
-import DataTypes.Component;
 import DataTypes.CoreComponent;
 import java.io.File;
 import java.io.FileNotFoundException;

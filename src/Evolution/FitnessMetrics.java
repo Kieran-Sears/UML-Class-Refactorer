@@ -8,6 +8,7 @@ package Evolution;
 import DataTypes.Component;
 import DataTypes.Class.Class;
 import DataTypes.Class.Operation;
+import DataTypes.Class.Parameter;
 import DataTypes.CoreComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,86 +37,73 @@ public class FitnessMetrics {
     }
 
     private double cohesionBetweenObjectClasses() {
-        
-        /*
-            int numUses[][] = new int[highestClasses + 1][highestClasses + 1];
-        //2.2 loop through each class
-        classesPresent.stream().forEach((thisClass) -> {
-            //get all the methods in this class
-            ArrayList<String> methodsInthisClass = classMethodsMap.get(thisClass);
-            if (methodsInthisClass != null) {
-                //2.3 foreach methid in the class
-                methodsInthisClass.stream().forEach((thisMethod) -> {
-                    //get all of the attributes it uses
-                    ArrayList<String> thisMethodAtts = UsesMap.get(thisMethod);
-                    thisMethodAtts.stream().map((attrString) -> {
-                        //and then what class they are in
-                        int attClass = classAssignments.get(attrString);
-                        System.out.println("dealing with method " + thisMethod + "in class " + thisClass + ": it uses attribute " + attrString + " which is is class " + attClass + "\n");
-                        return attClass;
-                    }).forEach((attClass) -> {
-                        //2.5 finally increment the numberof uses
-                        numUses[thisClass][attClass]++;
-                    });
-                });
-            }
-        });
-        */
-        
-         int runningTotal = 0;
-        int numOfClasses = 0;
+
+        double runningTotal = 0;
+        double numOfClasses = 0;
+        Class classe = null;
         // go through components
         for (Component component : components) {
             // isolate the current class
             if (component instanceof DataTypes.Class.Class) {
                 numOfClasses++;
-                Class classe = (DataTypes.Class.Class) component;
-                Integer classID = dependencies.lookupClass(classe.getID());
-              //  int forDebugging = runningTotal;
-                // find dependencies for the current class
-                for (int i = 0; i < dependencies.associationMatrix.length; i++) {
-                    for (int j = 0; j < dependencies.associationMatrix.length; j++) {
-                        if (i != classID || j != classID) {
-                            if (dependencies.associationMatrix[i][j] == 1) {
+                classe = (DataTypes.Class.Class) component;
+            }
+            // get each classes operations in turn
+            if (component instanceof DataTypes.Class.Operation) {
+                Operation operation = (DataTypes.Class.Operation) component;
+                ArrayList<Parameter> parameters = operation.getParameters();
+                // cycle through their parameters
+                for (Parameter parameter : parameters) {
+                    int i = components.indexOf(classe);
+                    while (i != -1) {
+                        // cycle through current class to find if contains collection of parameter object that operation uses
+                        CoreComponent get = components.get(i);
+                        if (get instanceof DataTypes.Class.Attribute) {
+                            if (get.getName().equalsIgnoreCase("collection<" + parameter.getType() + ">")) {
                                 runningTotal++;
                             }
                         }
+                        i++;
+                        if (get instanceof DataTypes.Class.Class || i == components.size()) {
+                            i=-1;
+                        }
+                        
                     }
                 }
-              //  System.out.println("Class " + classe.getName() + " cohesion between classes = " + (runningTotal - forDebugging));
             }
         }
-        return runningTotal / numOfClasses;
+        System.out.println("returning in cohesion " + (numOfClasses / runningTotal) * 100);
+        return (numOfClasses / runningTotal) * 100;
     }
 
     private double couplingBetweenObjectClasses() {
-        int runningTotal = 0;
-        int numOfClasses = 0;
+        double runningTotal = 0;
+        double numOfClasses = 0;
         for (Component component : components) {
             if (component instanceof DataTypes.Class.Class) {
                 numOfClasses++;
                 Class classe = (DataTypes.Class.Class) component;
                 Integer classID = dependencies.lookupClass(classe.getID());
-                int forDebugging = runningTotal;
+                //  double forDebugging = runningTotal;
                 for (int i = 0; i < dependencies.associationMatrix.length; i++) {
                     for (int j = 0; j < dependencies.associationMatrix.length; j++) {
-                        if (i == classID || j == classID) {
+                        if ((i == classID || j == classID) && i != j) {
                             if (dependencies.associationMatrix[i][j] == 1) {
                                 runningTotal++;
                             }
                         }
                     }
                 }
-                //System.out.println("Class " + classe.getName() + " coupling between classes = " + (runningTotal - forDebugging));
+                // System.out.println("Class " + classe.getName() + " coupling between classes = " + (runningTotal - forDebugging));
             }
         }
-        return runningTotal / numOfClasses;
+        System.out.println("returning in coupling " + (numOfClasses / runningTotal) * 100);
+        return (numOfClasses / runningTotal) * 100;
     }
 
     private double weightedMethodsPerClass() {
         int totalOperations = 0;
-      
- 
+
         HashMap<Class, Integer> WMPC = new HashMap();
         Iterator<CoreComponent> iterator = components.iterator();
         Class classe = null;
@@ -124,7 +112,7 @@ public class FitnessMetrics {
             Component next = iterator.next();
             if (next instanceof Class) {
                 classe = (Class) next;
-                WMPC.put(classe, 0);          
+                WMPC.put(classe, 0);
             }
             if (next instanceof Operation) {
                 totalOperations++;
@@ -133,7 +121,7 @@ public class FitnessMetrics {
                     get++;
                     WMPC.put(classe, get);
                 } else {
-                  //  System.out.println("no class for this operation, check a class is first component in chromosome");
+                    //  System.out.println("no class for this operation, check a class is first component in chromosome");
                 }
             }
         }
@@ -152,11 +140,11 @@ public class FitnessMetrics {
         System.out.println("average " + average);
         System.out.println("total " + total);
         // degrees of freedom = number of classes minus 1
-        ChiSquaredDistribution chi =  new ChiSquaredDistribution(nrOfClasses - 1);
-        double cumulativeProbability = 1 - chi.cumulativeProbability(total);
-     
+        ChiSquaredDistribution chi = new ChiSquaredDistribution(nrOfClasses - 1);
+        double cumulativeProbability = (1 - chi.cumulativeProbability(total)) * 100;
+
         System.out.println("cumulativeProbability " + cumulativeProbability);
-    
+
         return cumulativeProbability;
     }
 

@@ -17,7 +17,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +29,6 @@ import java.util.logging.Logger;
  * @author Kieran
  */
 public class ModelViewer {
-
 
     public File generateModelView(MetaModel model) {
 
@@ -74,7 +75,6 @@ public class ModelViewer {
 //                }
 //                        
 //            }
-            
             String jointjsClassesScript = generateClassesData(classMethodsMap, classAttributesMap, classesPresent);
             String jointjsCouplingScript = getCouplingData(model.getDependencies(), classesPresent);
             return generateHTMLView(jointjsClassesScript, jointjsCouplingScript);
@@ -161,21 +161,20 @@ public class ModelViewer {
         for (int i = 0; i < associationMatrix.length; i++) {
             String ReverseLookupClass = matrix.ReverseLookupClass(i);
             for (DataTypes.Class.Class classe : classesPresent) {
-                if (ReverseLookupClass.equalsIgnoreCase(classe.getName())){
-                classNames.put(i, classe.getName());
+                if (ReverseLookupClass.equalsIgnoreCase(classe.getName())) {
+                    classNames.put(i, classe.getName());
                 }
             }
         }
-        
-        
+
         for (int i = 0; i < associationMatrix.length; i++) {
             int[] row = associationMatrix[i];
             for (int j = 0; j < row.length; j++) {
-                if (i != j && associationMatrix[i][j] !=0 ) {
-                        jointjsCouplingScript = jointjsCouplingScript
-                                + "new joint.dia.Link({ source: { id: classes."
-                                + classNames.get(i) + ".id }, target: { id: classes."
-                                + classNames.get(j) + ".id }})," + "\n";
+                if (i != j && associationMatrix[i][j] != 0) {
+                    jointjsCouplingScript = jointjsCouplingScript
+                            + "new joint.dia.Link({ source: { id: classes."
+                            + classNames.get(i) + ".id }, target: { id: classes."
+                            + classNames.get(j) + ".id }})," + "\n";
                 }
             }
         }
@@ -185,16 +184,29 @@ public class ModelViewer {
     public File generateHTMLView(String jointjsClassesScript, String jointjsCouplingScript) {
         BufferedWriter writer = null;
         try {
-
-            String outHtmlPath = "C:\\Users\\Kieran\\Documents\\NetBeansProjects\\UMLRefactorer\\src\\view\\modelOutput.htm";
+            String outHtmlPath = System.getProperty("user.dir") + "\\generated files\\"+new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime())+".htm";
             String htmlFile = "";
-            BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\Kieran\\Documents\\NetBeansProjects\\UMLRefactorer\\src\\view\\UMLdisplay.htm"));
+            BufferedReader reader = new BufferedReader(new FileReader(System.getProperty("user.dir") + "\\src\\view\\UMLdisplay.htm"));
             String temp;
 
             while ((temp = reader.readLine()) != null) {
 
-                htmlFile += temp + "\n";
+                if (temp.contains("paperscroller link")) {
+                temp = "<link rel=\"stylesheet\" type=\"text/css\" href=\"File:///" + System.getProperty("user.dir") + "/lib/webview/joint.ui.paperScroller.css\" />";
+                }
+              
+                
+                
+                if (temp.contains("script sources")) {
+                    temp = " <link rel=\"stylesheet\" type=\"text/css\" href=\"File:///" + System.getProperty("user.dir") + "/lib/webview/joint.css\" />\n"
+                            + "    <script src=\"File:///" + System.getProperty("user.dir") + "/lib/webview/jquery.min.js\"></script>\n"
+                            + "    <script src=\"File:///" + System.getProperty("user.dir") + "/lib/webview/lodash.min.js\"></script>\n"
+                            + "    <script src=\"File:///" + System.getProperty("user.dir") + "/lib/webview/backbone-min.js\"></script>\n"
+                            + "    <script src=\"File:///" + System.getProperty("user.dir") + "/lib/webview/joint.js\"></script>";
+                } 
 
+                  htmlFile += temp + "\n";
+                
                 if (temp.contains("var classes")) {
                     htmlFile += jointjsClassesScript;
                 }
@@ -203,7 +215,7 @@ public class ModelViewer {
                     htmlFile += jointjsCouplingScript;
                 }
             }
-            new File(outHtmlPath).delete();
+           
             writer = new BufferedWriter(new FileWriter(outHtmlPath));
             writer.write(htmlFile);
             return new File(outHtmlPath);

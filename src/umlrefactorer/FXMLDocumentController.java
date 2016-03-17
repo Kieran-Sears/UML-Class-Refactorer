@@ -119,7 +119,7 @@ public class FXMLDocumentController implements Initializable {
 
     public void loadFile() {
         FileChooser fc = new FileChooser();
-        File developerFastFindFile = new File("C:\\Users\\Kieran\\Documents\\NetBeansProjects\\UMLRefactorer\\src\\Parser");
+        File developerFastFindFile = new File(System.getProperty("user.dir")+"\\testcases");
         if (developerFastFindFile.exists()) {
             fc.setInitialDirectory(developerFastFindFile);
         }
