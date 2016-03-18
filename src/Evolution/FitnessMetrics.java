@@ -47,24 +47,36 @@ public class FitnessMetrics {
             if (component instanceof DataTypes.Class.Class) {
                 numOfClasses++;
                 classe = (DataTypes.Class.Class) component;
+                System.out.println("added class " + classe.getName());
             }
             // get each classes operations in turn
             if (component instanceof DataTypes.Class.Operation) {
                 Operation operation = (DataTypes.Class.Operation) component;
                 ArrayList<Parameter> parameters = operation.getParameters();
+                System.out.println("operation " + operation.getName());
                 // cycle through their parameters
                 for (Parameter parameter : parameters) {
-                    int i = components.indexOf(classe);
+                    System.out.println("parameter " + parameter.getName() + "/" + parameter.getType());
+                    String attributeName = null;
+                    for (CoreComponent comp : components) {
+                        if (comp.getID().equalsIgnoreCase(parameter.getType())){
+                        attributeName = comp.getName();
+                        }
+                    }
+                    
+                    int i = components.indexOf(classe) + 1;
+                    System.out.println("index of this class in components " + i);
                     while (i != -1) {
+                      
                         // cycle through current class to find if contains collection of parameter object that operation uses
                         CoreComponent get = components.get(i);
                         if (get instanceof DataTypes.Class.Attribute) {
-                            if (get.getName().equalsIgnoreCase("collection<" + parameter.getType() + ">")) {
+                            if (get.getName().equalsIgnoreCase("collection<" + attributeName + ">")) {
                                 runningTotal++;
                             }
                         }
                         i++;
-                        if (get instanceof DataTypes.Class.Class || i == components.size()) {
+                        if (get instanceof DataTypes.Class.Class || i >= components.size()) {
                             i=-1;
                         }
                         
@@ -97,7 +109,7 @@ public class FitnessMetrics {
                 // System.out.println("Class " + classe.getName() + " coupling between classes = " + (runningTotal - forDebugging));
             }
         }
-        System.out.println("returning in coupling " + (numOfClasses / runningTotal) * 100);
+       
         return (numOfClasses / runningTotal) * 100;
     }
 
@@ -127,8 +139,6 @@ public class FitnessMetrics {
         }
 
         int nrOfClasses = WMPC.size();
-        System.out.println("totalOperations " + totalOperations);
-        System.out.println("nrOfClasses " + nrOfClasses);
         double average = ((double) totalOperations) / ((double) nrOfClasses);
         double total = 0;
         Iterator<Integer> iterator1 = WMPC.values().iterator();
@@ -137,14 +147,9 @@ public class FitnessMetrics {
             // sum of observed value for number of methods in each class vs. expected value (our average)
             total += ((next - average) * (next - average)) / average;
         }
-        System.out.println("average " + average);
-        System.out.println("total " + total);
         // degrees of freedom = number of classes minus 1
         ChiSquaredDistribution chi = new ChiSquaredDistribution(nrOfClasses - 1);
         double cumulativeProbability = (1 - chi.cumulativeProbability(total)) * 100;
-
-        System.out.println("cumulativeProbability " + cumulativeProbability);
-
         return cumulativeProbability;
     }
 
@@ -208,9 +213,9 @@ public class FitnessMetrics {
 
     @Override
     public String toString() {
-        return "\nCouplingBetweenObjectClasses=" + couplingBetweenObjectClasses
-                + ", \nWeightedMethodsPerClass=" + weightedMethodsPerClass
-                + ",}\n\n";
+        return "FitnessMetrics{" + "couplingBetweenObjectClasses=" + couplingBetweenObjectClasses + ", cohesionBetweenObjectClasses=" + cohesionBetweenObjectClasses + ", weightedMethodsPerClass=" + weightedMethodsPerClass + '}';
     }
+
+  
 
 }

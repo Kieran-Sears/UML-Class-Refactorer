@@ -112,12 +112,14 @@ public class RelationshipMatrix {
                 ArrayList<Parameter> parameters = operation.getParameters();
                 for (Parameter parameter : parameters) {
                     // each param that uses another class is a dependency
+                    System.out.println("operation " + parameter.getType());
                     addDependency(classee.getID(), parameter.getType());
                 }
             }
             if (component instanceof Attribute) {
                 Attribute attribute = (Attribute) component;
                 if (attribute.getDependency() != null) {
+                    System.out.println("attribute " + attribute.getDependency());
                     addDependency(classee.getID(), attribute.getDependency());
                 }
             }

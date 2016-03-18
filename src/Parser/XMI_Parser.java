@@ -142,14 +142,18 @@ public class XMI_Parser extends Parser {
             NamedNodeMap attributes = operationParameters.item(i).getAttributes();
             if (((Attr) attributes.getNamedItem("type")) != null) {
                 String nodeValue = attributes.getNamedItem("type").getNodeValue();
-                if (!nodeValue.equalsIgnoreCase("int_id") 
-                        &&!nodeValue.equalsIgnoreCase("String_id") 
-                        &&!nodeValue.equalsIgnoreCase("Boolean_id") 
-                        &&!nodeValue.equalsIgnoreCase("void_id")) {
-                Parameter parameter = new Parameter();
-                parameter.setID(attributes.getNamedItem("xmi:id").getNodeValue());
-                parameter.setType(attributes.getNamedItem("type").getNodeValue());
-                parameterArray.add(parameter);
+                if (!nodeValue.equalsIgnoreCase("int_id")
+                        && !nodeValue.equalsIgnoreCase("Integer_id")
+                        && !nodeValue.equalsIgnoreCase("Float_id")
+                        && !nodeValue.equalsIgnoreCase("ArrayList_id")
+                        && !nodeValue.equalsIgnoreCase("Double_id")
+                        && !nodeValue.equalsIgnoreCase("String_id")
+                        && !nodeValue.equalsIgnoreCase("Boolean_id")
+                        && !nodeValue.equalsIgnoreCase("void_id")) {
+                    Parameter parameter = new Parameter();
+                    parameter.setID(attributes.getNamedItem("xmi:id").getNodeValue());
+                    parameter.setType(attributes.getNamedItem("type").getNodeValue());
+                    parameterArray.add(parameter);
                 }
             }
         }
