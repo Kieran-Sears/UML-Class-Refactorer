@@ -7,11 +7,12 @@ package Evolution;
 
 import DataTypes.Component;
 import DataTypes.CoreComponent;
-import DesignPatterns.MutationHeuristic;
+import DesignPatterns.AntiPattern;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 
 /**
  *
@@ -29,12 +30,12 @@ public class GeneticAlgorithm {
         this.populationSize = populationSize;
         this.mutationRate = mutationRate;
         this.crossoverRate = crossoverRate;
+        model.initialiseDependenciesAndFitness(); // this line
         population.add(model);
-
         for (int i = 1; i < populationSize; i++) {
-            MetaModel mutated = mutate(model);
-            mutated.updateDependenciesAndFitness();
-            population.add(mutated);
+            MetaModel randomized = randomizeComponents(model);
+            randomized.updateDependenciesAndFitness();
+            population.add(randomized);
         }
     }
 
@@ -42,7 +43,6 @@ public class GeneticAlgorithm {
         selection();
         for (MetaModel model : population) {
             MetaModel crossedAndMutated = mutate(model);
-            crossedAndMutated.dependencies.sortMethodDependencies(crossedAndMutated.chromosome);
             crossedAndMutated.updateDependenciesAndFitness();
         }
     }
@@ -153,6 +153,21 @@ public class GeneticAlgorithm {
     }
 
     // evolution operators
+    private MetaModel randomizeComponents(MetaModel model) {
+        ArrayList<CoreComponent> components = model.getComponents();
+        ArrayList<CoreComponent> newComponents = new ArrayList();
+        newComponents.add(components.get(0));
+        components.remove(0);
+        Random rand = new Random();
+        while(components.size() > 0) {
+            int index = rand.nextInt(components.size());
+            newComponents.add(components.get(index));
+            components.remove(index);
+        }
+        model.setComponents(newComponents);
+        return model;
+    }
+
     private MetaModel mutate(MetaModel model) {
 
         HashMap<Integer, Integer> indexes = new HashMap();
@@ -182,20 +197,16 @@ public class GeneticAlgorithm {
                 chromosome.add(next.getValue(), get);
             }
         }
-        //model.setChromosome(copy);
+        model.setComponents(chromosome);
         return model;
     }
 
-    private MetaModel mutate(MetaModel model, MutationHeuristic heuristic) {
-        // guided mutation
-        // if close to a target pattern converge on it
-        // if close to an anti-pattern mutate away from it - random?
+    private MetaModel mutate(MetaModel model, AntiPattern heuristic) {
+       
         return model;
     }
 
     // end of evolution operators
-   
-
     // getters and setters
     public double getMutationRate() {
         return mutationRate;
@@ -219,12 +230,12 @@ public class GeneticAlgorithm {
 
     public void setPopulation(ArrayList<MetaModel> population) {
         this.population = population;
-    }  
+    }
 // end of getters and setters
-    
-    public void printPopulationDependencies(){
+
+    public void printPopulationDependencies() {
         for (MetaModel pop : population) {
-            System.out.println( pop.getDependencies().toString());
+            System.out.println(pop.getDependencies().toString());
         }
     }
 }

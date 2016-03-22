@@ -63,6 +63,13 @@ public class FXMLDocumentController implements Initializable {
         generateButton.setOnAction((event) -> {
             initialiseGA();
         });
+         StackedBarChart.Series<String, Number> modelResults = new StackedBarChart.Series<>();
+        modelResults.setName(Integer.toString(generation));
+        modelResults.getData().add(new XYChart.Data<>("Cohesion", 0));
+        modelResults.getData().add(new XYChart.Data<>("Coupling", 0));
+        modelResults.getData().add(new XYChart.Data<>("Methods\nDistribution", 0));
+        stackBarChartData.addAll(modelResults);
+        chart.setData(stackBarChartData);
     }
 
     @FXML
@@ -76,7 +83,7 @@ public class FXMLDocumentController implements Initializable {
         evolution.initialiseGA(original, popSize, mutRate, crossRate);
         ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation();
         for (MetaModel metaModel : evolvePopulation) {
-            updateChart(metaModel);
+            updateChart(metaModel, evolvePopulation.indexOf(metaModel));
             File view = viewer.generateModelView(metaModel);
             WebView webview = new WebView();  // the thumbnail preview of the artefact in cell
             WebEngine engine = webview.getEngine();
@@ -94,10 +101,11 @@ public class FXMLDocumentController implements Initializable {
     public void iterate() {
         stackBarChartData = FXCollections.observableArrayList();
         ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation();
+        generation++;
         for (MetaModel metaModel : evolvePopulation) {
             patterns.scanForAntiPatterns(original);
             patterns.scanForPatterns(original);
-            updateChart(metaModel);
+            updateChart(metaModel, evolvePopulation.indexOf(metaModel));
             File view = viewer.generateModelView(metaModel);
             WebView webview = new WebView();  // the thumbnail preview of the artefact in cell
             WebEngine engine = webview.getEngine();
@@ -107,12 +115,12 @@ public class FXMLDocumentController implements Initializable {
         }
     }
 
-    public void updateChart(MetaModel model) {
+    public void updateChart(MetaModel model, int populationMember) {
         StackedBarChart.Series<String, Number> modelResults = new StackedBarChart.Series<>();
-        modelResults.setName(Integer.toString(generation));
+        modelResults.setName(Integer.toString(populationMember));
         modelResults.getData().add(new XYChart.Data<>("Cohesion", model.getFitness().getCohesionBetweenObjectClasses()));
         modelResults.getData().add(new XYChart.Data<>("Coupling", model.getFitness().getCouplingBetweenObjectClasses()));
-        modelResults.getData().add(new XYChart.Data<>("Methods\nDistrobution", model.getFitness().getWeightedMethodsPerClass()));
+        modelResults.getData().add(new XYChart.Data<>("Methods\nDistribution", model.getFitness().getWeightedMethodsPerClass()));
         stackBarChartData.addAll(modelResults);
         chart.setData(stackBarChartData);
     }
@@ -128,7 +136,7 @@ public class FXMLDocumentController implements Initializable {
             MetaModel model = parser.extractModelFromXMI(file);
             patterns.scanForAntiPatterns(model);
             patterns.scanForPatterns(model);
-            updateChart(model);
+            updateChart(model, 0);
             original = model;
             File view = viewer.generateModelView(model);
             WebView webview = new WebView();  // the thumbnail preview of the artefact in cell

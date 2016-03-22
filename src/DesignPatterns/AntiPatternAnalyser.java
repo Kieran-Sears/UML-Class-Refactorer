@@ -5,7 +5,9 @@
  */
 package DesignPatterns;
 
+import DataTypes.CoreComponent;
 import Evolution.MetaModel;
+import java.util.ArrayList;
 
 /**
  *
@@ -13,6 +15,7 @@ import Evolution.MetaModel;
  */
 public interface AntiPatternAnalyser {
     
-    public MutationHeuristic scanModel(MetaModel model);
+    public void scanModel(MetaModel model);
     
+    public ArrayList<CoreComponent> PerformMutation(ArrayList<CoreComponent> components);
 }

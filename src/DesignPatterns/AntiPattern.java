@@ -5,19 +5,15 @@
  */
 package DesignPatterns;
 
-import Evolution.MetaModel;
-
 /**
  *
  * @author Kieran
  */
 public abstract class AntiPattern implements AntiPatternAnalyser {
     
-    MetaModel model;
-    MutationHeuristic mutationHeuristic;
+  
 
-    public AntiPattern() {
-        this.mutationHeuristic = new MutationHeuristic();
-    }
+ 
+   
     
 }
