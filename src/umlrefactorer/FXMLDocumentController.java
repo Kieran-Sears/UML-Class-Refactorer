@@ -14,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.LineChart;
 import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
@@ -37,14 +38,14 @@ public class FXMLDocumentController implements Initializable {
     int generation = 0;
     MetaModel original;
 
-    ObservableList<XYChart.Series<String, Number>> stackBarChartData;
+    ObservableList<XYChart.Series<String, Number>> ChartData;
 
     @FXML
     private Button generateButton;
     @FXML
     AnchorPane displayPane;
     @FXML
-    StackedBarChart<String, Number> chart;
+    LineChart<String, Number> chart;
     @FXML
     private TextField populationSize;
     @FXML
@@ -54,7 +55,7 @@ public class FXMLDocumentController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        stackBarChartData = FXCollections.observableArrayList();
+        ChartData = FXCollections.observableArrayList();
         parser = new ParserController();
         evolution = new EvolutionController();
         patterns = new DesignPatternsController();
@@ -63,18 +64,17 @@ public class FXMLDocumentController implements Initializable {
         generateButton.setOnAction((event) -> {
             initialiseGA();
         });
-         StackedBarChart.Series<String, Number> modelResults = new StackedBarChart.Series<>();
+         LineChart.Series<String, Number> modelResults = new LineChart.Series<>();
         modelResults.setName(Integer.toString(generation));
         modelResults.getData().add(new XYChart.Data<>("Cohesion", 0));
         modelResults.getData().add(new XYChart.Data<>("Coupling", 0));
         modelResults.getData().add(new XYChart.Data<>("Methods\nDistribution", 0));
-        stackBarChartData.addAll(modelResults);
-        chart.setData(stackBarChartData);
+        ChartData.addAll(modelResults);
+        chart.setData(ChartData);
     }
 
     @FXML
     private void initialiseGA() {
-        stackBarChartData = FXCollections.observableArrayList();
         int popSize = Integer.parseInt(populationSize.getText());
         float mutRate = Float.parseFloat(mutationRate.getText());
         float crossRate = Float.parseFloat(crossoverRate.getText());
@@ -99,7 +99,7 @@ public class FXMLDocumentController implements Initializable {
     }
 
     public void iterate() {
-        stackBarChartData = FXCollections.observableArrayList();
+        ChartData = FXCollections.observableArrayList();
         ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation();
         generation++;
         for (MetaModel metaModel : evolvePopulation) {
@@ -116,13 +116,14 @@ public class FXMLDocumentController implements Initializable {
     }
 
     public void updateChart(MetaModel model, int populationMember) {
+        ChartData.clear();
         StackedBarChart.Series<String, Number> modelResults = new StackedBarChart.Series<>();
         modelResults.setName(Integer.toString(populationMember));
         modelResults.getData().add(new XYChart.Data<>("Cohesion", model.getFitness().getCohesionBetweenObjectClasses()));
         modelResults.getData().add(new XYChart.Data<>("Coupling", model.getFitness().getCouplingBetweenObjectClasses()));
         modelResults.getData().add(new XYChart.Data<>("Methods\nDistribution", model.getFitness().getWeightedMethodsPerClass()));
-        stackBarChartData.addAll(modelResults);
-        chart.setData(stackBarChartData);
+        ChartData.addAll(modelResults);
+        chart.setData(ChartData);
     }
 
     public void loadFile() {

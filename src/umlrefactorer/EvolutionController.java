@@ -25,9 +25,13 @@ public class EvolutionController {
     }
 
     public ArrayList<MetaModel> evolvePopulation() {
-            GA.evolvePopulation();
+        GA.selection();
+        for (MetaModel model : GA.population) {
+            MetaModel crossedAndMutated = GA.mutate(model);
+            crossedAndMutated.updateDependenciesAndFitness();
+        }
             GA.printPopulationDependencies();
-            return GA.getPopulation();
+            return GA.population;
     }
 
   

@@ -21,7 +21,7 @@ import java.util.Random;
 public class GeneticAlgorithm {
 
     // attributes
-    private ArrayList<MetaModel> population = new ArrayList();
+    public ArrayList<MetaModel> population = new ArrayList();
     private int populationSize;
     private double mutationRate;
     private double crossoverRate;
@@ -39,13 +39,7 @@ public class GeneticAlgorithm {
         }
     }
 
-    public void evolvePopulation() {
-        selection();
-        for (MetaModel model : population) {
-            MetaModel crossedAndMutated = mutate(model);
-            crossedAndMutated.updateDependenciesAndFitness();
-        }
-    }
+ 
 
     public ArrayList<MetaModel> selection() {
         double randNum;
@@ -153,7 +147,7 @@ public class GeneticAlgorithm {
     }
 
     // evolution operators
-    private MetaModel randomizeComponents(MetaModel model) {
+    public MetaModel randomizeComponents(MetaModel model) {
         ArrayList<CoreComponent> components = model.getComponents();
         ArrayList<CoreComponent> newComponents = new ArrayList();
         newComponents.add(components.get(0));
@@ -168,7 +162,7 @@ public class GeneticAlgorithm {
         return model;
     }
 
-    private MetaModel mutate(MetaModel model) {
+    public MetaModel mutate(MetaModel model) {
 
         HashMap<Integer, Integer> indexes = new HashMap();
         ArrayList<CoreComponent> chromosome = model.getComponents();
@@ -201,7 +195,7 @@ public class GeneticAlgorithm {
         return model;
     }
 
-    private MetaModel mutate(MetaModel model, AntiPattern heuristic) {
+    public MetaModel mutate(MetaModel model, AntiPattern heuristic) {
        
         return model;
     }
@@ -224,13 +218,6 @@ public class GeneticAlgorithm {
         this.crossoverRate = crossoverRate;
     }
 
-    public ArrayList<MetaModel> getPopulation() {
-        return population;
-    }
-
-    public void setPopulation(ArrayList<MetaModel> population) {
-        this.population = population;
-    }
 // end of getters and setters
 
     public void printPopulationDependencies() {
