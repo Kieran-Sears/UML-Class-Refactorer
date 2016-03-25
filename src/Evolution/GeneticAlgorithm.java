@@ -30,7 +30,6 @@ public class GeneticAlgorithm {
         this.populationSize = populationSize;
         this.mutationRate = mutationRate;
         this.crossoverRate = crossoverRate;
-        model.initialiseDependenciesAndFitness(); // this line
         population.add(model);
         for (int i = 1; i < populationSize; i++) {
             MetaModel randomized = randomizeComponents(model);

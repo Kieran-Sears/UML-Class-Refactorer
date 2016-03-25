@@ -12,17 +12,25 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import view.ModelViewer;
 
 /**
@@ -43,9 +51,7 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private Button generateButton;
     @FXML
-    AnchorPane displayPane;
-    @FXML
-    LineChart<String, Number> chart;
+    AreaChart<String, Number> chart;
     @FXML
     private TextField populationSize;
     @FXML
@@ -64,7 +70,7 @@ public class FXMLDocumentController implements Initializable {
         generateButton.setOnAction((event) -> {
             initialiseGA();
         });
-         LineChart.Series<String, Number> modelResults = new LineChart.Series<>();
+        LineChart.Series<String, Number> modelResults = new LineChart.Series<>();
         modelResults.setName(Integer.toString(generation));
         modelResults.getData().add(new XYChart.Data<>("Cohesion", 0));
         modelResults.getData().add(new XYChart.Data<>("Coupling", 0));
@@ -75,6 +81,7 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void initialiseGA() {
+        ChartData.clear();
         int popSize = Integer.parseInt(populationSize.getText());
         float mutRate = Float.parseFloat(mutationRate.getText());
         float crossRate = Float.parseFloat(crossoverRate.getText());
@@ -84,12 +91,6 @@ public class FXMLDocumentController implements Initializable {
         ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation();
         for (MetaModel metaModel : evolvePopulation) {
             updateChart(metaModel, evolvePopulation.indexOf(metaModel));
-            File view = viewer.generateModelView(metaModel);
-            WebView webview = new WebView();  // the thumbnail preview of the artefact in cell
-            WebEngine engine = webview.getEngine();
-            engine.setJavaScriptEnabled(true);
-            engine.load("File:///" + view.getAbsolutePath());
-            displayPane.getChildren().add(webview);
         }
         generateButton.setText("Next Generation");
         generateButton.setOnAction((event) -> {
@@ -99,36 +100,37 @@ public class FXMLDocumentController implements Initializable {
     }
 
     public void iterate() {
-        ChartData = FXCollections.observableArrayList();
+        ChartData.clear();
         ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation();
         generation++;
         for (MetaModel metaModel : evolvePopulation) {
             patterns.scanForAntiPatterns(original);
             patterns.scanForPatterns(original);
             updateChart(metaModel, evolvePopulation.indexOf(metaModel));
-            File view = viewer.generateModelView(metaModel);
-            WebView webview = new WebView();  // the thumbnail preview of the artefact in cell
-            WebEngine engine = webview.getEngine();
-            engine.setJavaScriptEnabled(true);
-            engine.load("File:///" + view.getAbsolutePath());
-            displayPane.getChildren().add(webview);
         }
     }
 
     public void updateChart(MetaModel model, int populationMember) {
-        ChartData.clear();
         StackedBarChart.Series<String, Number> modelResults = new StackedBarChart.Series<>();
         modelResults.setName(Integer.toString(populationMember));
+
+        System.out.println("cohesion "
+                + model.getFitness().getCohesionBetweenObjectClasses() + "\ncoupling "
+                + model.getFitness().getCouplingBetweenObjectClasses() + "\nwmpc "
+                + model.getFitness().getWeightedMethodsPerClass());
+
         modelResults.getData().add(new XYChart.Data<>("Cohesion", model.getFitness().getCohesionBetweenObjectClasses()));
         modelResults.getData().add(new XYChart.Data<>("Coupling", model.getFitness().getCouplingBetweenObjectClasses()));
         modelResults.getData().add(new XYChart.Data<>("Methods\nDistribution", model.getFitness().getWeightedMethodsPerClass()));
+       
         ChartData.addAll(modelResults);
         chart.setData(ChartData);
+        setOnMouseEventsOnSeries(modelResults.getNode(), model);
     }
 
     public void loadFile() {
         FileChooser fc = new FileChooser();
-        File developerFastFindFile = new File(System.getProperty("user.dir")+"\\testcases");
+        File developerFastFindFile = new File(System.getProperty("user.dir") + "\\testcases");
         if (developerFastFindFile.exists()) {
             fc.setInitialDirectory(developerFastFindFile);
         }
@@ -139,15 +141,37 @@ public class FXMLDocumentController implements Initializable {
             patterns.scanForPatterns(model);
             updateChart(model, 0);
             original = model;
-            File view = viewer.generateModelView(model);
-            WebView webview = new WebView();  // the thumbnail preview of the artefact in cell
-            WebEngine engine = webview.getEngine();
-            engine.setJavaScriptEnabled(true);
-            engine.load("File:///" + view.getAbsolutePath());
-            displayPane.getChildren().add(webview);
         } catch (IllegalArgumentException e) {
             System.out.println("user cancelled loading file");
         }
+    }
+
+    private void setOnMouseEventsOnSeries(Node node, MetaModel model) {
+        
+
+        node.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent t) {
+                Stage stage = new Stage();
+                File view = viewer.generateModelView(model);
+                WebView webview = new WebView();  // the thumbnail preview of the artefact in cell
+                WebEngine engine = webview.getEngine();
+                engine.setJavaScriptEnabled(true);
+                engine.load("File:///" + view.getAbsolutePath());
+
+                final VBox wizBox = new VBox(5);
+                wizBox.setAlignment(Pos.CENTER);
+                wizBox.getChildren().setAll(webview);
+
+                Scene scene = new Scene(wizBox, 200, 200);
+                stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initOwner(chart.getScene().getWindow());
+                stage.showAndWait();
+                
+            }
+        });
+
     }
 
 }
