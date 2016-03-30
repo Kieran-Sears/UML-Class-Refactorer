@@ -19,22 +19,16 @@
                         <AnchorPane id="AnchorPane" prefHeight="628.0" prefWidth="887.0">
                             <children>
                                 <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
-                              <VBox layoutX="16.0" layoutY="14.0" prefHeight="200.0" prefWidth="148.0">
+                              <VBox layoutX="16.0" layoutY="14.0" prefHeight="200.0" prefWidth="148.0" spacing="15.0">
                                  <children>
-                                    <HBox prefHeight="100.0" prefWidth="200.0">
-                                       <children>
-                                            <Button fx:id="generateButton" text="Evolve" />
-                                          <Button mnemonicParsing="false" text="Reset" />
-                                       </children>
-                                    </HBox>
+                                      <Button fx:id="generateButton" prefHeight="25.0" prefWidth="147.0" text="Evolve" />
                                     <Label text="Population Size" />
                                     <TextField fx:id="populationSize" text="1" />
                                     <Label text="Number Of Generations" />
                                     <TextField fx:id="numOfGenerations" text="1" />
                                     <Label text="Mutation Rate" />
                                     <TextField fx:id="mutationRate" text="0.05" />
-                                    <Label text="Crossover Rate" />
-                                    <TextField fx:id="crossoverRate" text="0" />
+                                    <Button mnemonicParsing="false" onAction="#reset" prefHeight="25.0" prefWidth="147.0" text="Reset" />
                                  </children>
                               </VBox>
                               <AreaChart fx:id="chart" layoutX="223.0" layoutY="29.0" prefHeight="567.0" prefWidth="808.0">

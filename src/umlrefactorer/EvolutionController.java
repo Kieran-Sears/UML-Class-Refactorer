@@ -9,7 +9,6 @@ import Evolution.MetaModel;
 import Evolution.GeneticAlgorithm;
 import java.util.ArrayList;
 
-
 /**
  *
  * @author Kieran
@@ -18,21 +17,22 @@ public class EvolutionController {
 
     GeneticAlgorithm GA;
 
-    public void initialiseGA(MetaModel mm, int populationSize, float mutationRate, float crossoverRate) {
+    public void initialiseGA(MetaModel mm, int populationSize, float mutationRate) {
         GA = new GeneticAlgorithm();
-        GA.initialiseGA(mm, populationSize, mutationRate, crossoverRate);
-        GA.printPopulationDependencies();
+        GA.initialiseGA(mm, populationSize, mutationRate);
+        //GA.printPopulationDependencies();
     }
 
     public ArrayList<MetaModel> evolvePopulation() {
-        GA.selection();
-        for (MetaModel model : GA.population) {
+        ArrayList<MetaModel> selection = GA.selection();
+        ArrayList<MetaModel> newPopulation = new ArrayList();
+        for (MetaModel model : selection) {
             MetaModel crossedAndMutated = GA.mutate(model);
             crossedAndMutated.updateDependenciesAndFitness();
+            newPopulation.add(crossedAndMutated);
         }
-            GA.printPopulationDependencies();
-            return GA.population;
+        GA.setPopulation(newPopulation);
+        return newPopulation;
     }
 
-  
 }

@@ -19,26 +19,40 @@ import java.util.Random;
  * @author Kieran
  */
 public class GeneticAlgorithm {
-
-    // attributes
-    public ArrayList<MetaModel> population = new ArrayList();
+    
+    private ArrayList<MetaModel> population = new ArrayList();
     private int populationSize;
     private double mutationRate;
-    private double crossoverRate;
+   
 
-    public void initialiseGA(MetaModel model, int populationSize, double mutationRate, double crossoverRate) {
+    public void initialiseGA(MetaModel model, int populationSize, double mutationRate) {
         this.populationSize = populationSize;
         this.mutationRate = mutationRate;
-        this.crossoverRate = crossoverRate;
-        population.add(model);
-        for (int i = 1; i < populationSize; i++) {
-            MetaModel randomized = randomizeComponents(model);
-            randomized.updateDependenciesAndFitness();
-            population.add(randomized);
-        }
-    }
 
- 
+        // add random new individuals to the population, randomness is important for initial exploration of search space
+        for (int i = 1; i < populationSize; i++) {
+            MetaModel newModel = new MetaModel();
+            ArrayList<CoreComponent> components = new ArrayList();
+            for (CoreComponent component : model.getComponents()) {
+                components.add(component);
+            }
+            ArrayList<CoreComponent> newComponents = new ArrayList();
+            newComponents.add(components.get(0));
+            components.remove(0);
+            Random rand = new Random();
+            while (components.size() > 0) {
+                int index = rand.nextInt(components.size());
+                newComponents.add(components.get(index));
+                components.remove(index);
+            }
+            newModel.setDependencies(model.getDependencies());
+            newModel.setComponents(newComponents);
+            newModel.updateDependenciesAndFitness();
+            population.add(newModel);
+        }
+
+        population.add(model);
+    }
 
     public ArrayList<MetaModel> selection() {
         double randNum;
@@ -47,7 +61,7 @@ public class GeneticAlgorithm {
         int count = divisor / 3;
 
         ArrayList<MetaModel> bestIndividuals = new ArrayList();
-        ArrayList<MetaModel> lowestCoupledModels = new ArrayList(); // minimization
+        ArrayList<MetaModel> lowestCoupledModels = new ArrayList();
         ArrayList<MetaModel> highestCohesiveModels = new ArrayList();
         ArrayList<MetaModel> bestMethodDistrobutionModels = new ArrayList();
 
@@ -124,41 +138,29 @@ public class GeneticAlgorithm {
             bestIndividuals.add(highestCohesiveModels.get(i));
             bestIndividuals.add(bestMethodDistrobutionModels.get(i));
         }
+
         while (true) {
-            bestIndividuals.add(lowestCoupledModels.get((int) (Math.random() * populationSize)));
-            remainder--;
             if (remainder == 0) {
                 break;
+            } else {
+                bestIndividuals.add(lowestCoupledModels.get((int) (Math.random() * populationSize)));
+                remainder--;
             }
-            bestIndividuals.add(highestCohesiveModels.get((int) (Math.random() * populationSize)));
-            remainder--;
             if (remainder == 0) {
                 break;
+            } else {
+                bestIndividuals.add(highestCohesiveModels.get((int) (Math.random() * populationSize)));
+                remainder--;
             }
-            bestIndividuals.add(bestMethodDistrobutionModels.get((int) (Math.random() * populationSize)));
-            remainder--;
             if (remainder == 0) {
                 break;
+            } else {
+                bestIndividuals.add(bestMethodDistrobutionModels.get((int) (Math.random() * populationSize)));
+                remainder--;
             }
-        }
 
+        }
         return bestIndividuals;
-    }
-
-    // evolution operators
-    public MetaModel randomizeComponents(MetaModel model) {
-        ArrayList<CoreComponent> components = model.getComponents();
-        ArrayList<CoreComponent> newComponents = new ArrayList();
-        newComponents.add(components.get(0));
-        components.remove(0);
-        Random rand = new Random();
-        while(components.size() > 0) {
-            int index = rand.nextInt(components.size());
-            newComponents.add(components.get(index));
-            components.remove(index);
-        }
-        model.setComponents(newComponents);
-        return model;
     }
 
     public MetaModel mutate(MetaModel model) {
@@ -195,7 +197,7 @@ public class GeneticAlgorithm {
     }
 
     public MetaModel mutate(MetaModel model, AntiPattern heuristic) {
-       
+
         return model;
     }
 
@@ -209,16 +211,24 @@ public class GeneticAlgorithm {
         this.mutationRate = mutationRate;
     }
 
-    public double getCrossoverRate() {
-        return crossoverRate;
+
+    public ArrayList<MetaModel> getPopulation() {
+        return population;
     }
 
-    public void setCrossoverRate(double crossoverRate) {
-        this.crossoverRate = crossoverRate;
+    public void setPopulation(ArrayList<MetaModel> population) {
+        this.population = population;
+    }
+
+    public int getPopulationSize() {
+        return populationSize;
+    }
+
+    public void setPopulationSize(int populationSize) {
+        this.populationSize = populationSize;
     }
 
 // end of getters and setters
-
     public void printPopulationDependencies() {
         for (MetaModel pop : population) {
             System.out.println(pop.getDependencies().toString());

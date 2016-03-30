@@ -22,13 +22,13 @@ import java.util.logging.Logger;
 public class MetaModel {
 
     // fitness is for each class in the model, stored by class xmi:id key
-    FitnessMetrics fitness;
+    private FitnessMetrics fitness;
     // shows connections between classes
-    RelationshipMatrix dependencies;
+    private RelationshipMatrix dependencies;
     // holds all the methods attributes and classes
-    ArrayList<CoreComponent> chromosome;
+    private ArrayList<CoreComponent> chromosome;
     // a list of associations present (composition, aggregation, generalisation etc)
-    ArrayList<Association> associations;
+    private ArrayList<Association> associations;
 
     public void initialiseDependenciesAndFitness(){
         dependencies = new RelationshipMatrix(chromosome, associations);
@@ -42,12 +42,11 @@ public class MetaModel {
     }
     
     
-    
+       // getters and setters 
     public FitnessMetrics getFitness() {    
         return fitness;
     }
 
-    // getters and setters
     public void setFitness(FitnessMetrics fitness) {
         this.fitness = fitness;
     }
@@ -76,6 +75,7 @@ public class MetaModel {
     public void setDependencies(RelationshipMatrix dependencies) {
         this.dependencies = dependencies;
     }
+    // end of getters and setters
     
      // Printing results out
     public void outputResultsToFile(File file) {
@@ -102,8 +102,6 @@ public class MetaModel {
             string += dependencies.toString();
             string += fitness.toString();
         System.out.println(string);
-    }
-
-  
+    } 
     // end of printing
 }
