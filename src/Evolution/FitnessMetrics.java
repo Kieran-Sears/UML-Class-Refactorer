@@ -38,7 +38,8 @@ public class FitnessMetrics {
 
     private double cohesionBetweenObjectClasses() {
 
-        double runningTotal = 0;
+        double internals = 0;
+        double externals = 0;
         double numOfClasses = 0;
         Class classe = null;
         // go through components
@@ -48,39 +49,49 @@ public class FitnessMetrics {
                 numOfClasses++;
                 classe = (DataTypes.Class.Class) component;
             }
-            // get each classes operations in turn
+            // get each operation in class in turn
             if (component instanceof DataTypes.Class.Operation) {
                 Operation operation = (DataTypes.Class.Operation) component;
                 ArrayList<Parameter> parameters = operation.getParameters();
-                // cycle through their parameters
+                // cycle through operation's parameters
                 for (Parameter parameter : parameters) {
                     String attributeName = null;
                     for (CoreComponent comp : components) {
-                        if (comp.getID().equalsIgnoreCase(parameter.getType())){
-                        attributeName = comp.getName();
+                        if (comp.getID().equalsIgnoreCase(parameter.getType())) {
+                            attributeName = comp.getName();
                         }
                     }
-                    
-                    int i = components.indexOf(classe) + 1;
+
+                    // find out if param is internal or ext to class
+                    int i = 0;
+                    DataTypes.Class.Class class2 = null;
                     while (i != -1) {
-                      
-                        // cycle through current class to find if contains collection of parameter object that operation uses
-                        CoreComponent get = components.get(i);
-                        if (get instanceof DataTypes.Class.Attribute) {
-                            if (get.getName().equalsIgnoreCase("collection<" + attributeName + ">")) {
-                                runningTotal++;
+                        if (i >= components.size()) {
+                            i = -1;
+                        } else {
+                            CoreComponent get = components.get(i);
+                            if (get instanceof DataTypes.Class.Class) {
+                                class2 = (Class) get;
                             }
+                            if (class2.getID().equalsIgnoreCase(classe.getID()) && get instanceof DataTypes.Class.Attribute && get.getName().equalsIgnoreCase("collection<" + attributeName + ">")) {
+                                internals++;
+                            }
+                            if (!class2.getID().equalsIgnoreCase(classe.getID()) && get instanceof DataTypes.Class.Attribute && get.getName().equalsIgnoreCase("collection<" + attributeName + ">")) {
+                                externals++;
+                            }
+                            i++;
                         }
-                        i++;
-                        if (get instanceof DataTypes.Class.Class || i >= components.size()) {
-                            i=-1;
-                        }
-                        
                     }
                 }
             }
         }
-        return (numOfClasses / runningTotal) * 100;
+
+        double percentageOfCohesiveMethods =  ( internals / (internals + externals)) * 100;
+        if (percentageOfCohesiveMethods == Double.POSITIVE_INFINITY) {
+            return 0;
+        } else {
+            return percentageOfCohesiveMethods;
+        }
     }
 
     private double couplingBetweenObjectClasses() {
@@ -91,21 +102,20 @@ public class FitnessMetrics {
                 numOfClasses++;
                 Class classe = (DataTypes.Class.Class) component;
                 Integer classID = dependencies.lookupClass(classe.getID());
-                //  double forDebugging = runningTotal;
                 for (int i = 0; i < dependencies.associationMatrix.length; i++) {
                     for (int j = 0; j < dependencies.associationMatrix.length; j++) {
-                        if ((i == classID || j == classID) && i != j) {
-                            if (dependencies.associationMatrix[i][j] == 1) {
+                        if (i == classID && i != j) { //   if ((i == classID || j == classID) && i != j) {
+                            if (dependencies.associationMatrix[i][j] != 0) {   
                                 runningTotal++;
                             }
                         }
                     }
                 }
-                // System.out.println("Class " + classe.getName() + " coupling between classes = " + (runningTotal - forDebugging));
             }
         }
-       
-        return (numOfClasses / runningTotal) * 100;
+    double percent =  (runningTotal / ((numOfClasses* (numOfClasses -1)) / 2)) * 100;
+        System.out.println("percent " + percent);
+        return percent;
     }
 
     private double weightedMethodsPerClass() {
@@ -148,52 +158,6 @@ public class FitnessMetrics {
         return cumulativeProbability;
     }
 
-//    public double distanceFromMainSequence(ArrayList<Component> components, RelationshipMatrix dependencies) {
-//
-////    D = (A + I − 1) / √2 
-////  Where:
-////    I = Efferent Coupling / ( Efferent Coupling + Afferent Coupling )
-////    A = Abstract Classes / Total Classes
-////      
-////        Afferent couplings : A class afferent couplings is a measure of how many other classes use the specific class.
-////        Efferent couplings : A class efferent couplings is a measure of how many different classes are used by the specific class.
-//        int abstractClasses = 0;
-//        int efferentCoupling = 0;
-//        int afferentCoupling = 0;
-//        int totalClasses = 0;
-//        Iterator<Component> iterator = components.iterator();
-//        while (iterator.hasNext()) {
-//            Object next = iterator.next();
-//            if (next instanceof Class) {
-//                totalClasses++;
-//                Class _class = (Class) next;
-//                if (_class.getIsAbstract()) {
-//                    abstractClasses++;
-//                }
-//                Integer dependencyID = dependencies.lookupTable.get(_class.getID());
-//                int[] efferentArray = dependencies.associationMatrix[dependencyID];
-//                for (int i = 0; i < efferentArray.length; i++) {
-//                    if (efferentArray[i] != 0) {
-//                        efferentCoupling++;
-//                    }
-//                }
-//                int[][] afferentArray = dependencies.associationMatrix;
-//                for (int i = 0; i < afferentArray.length; i++) {
-//                    if (i != dependencyID) {
-//                        int[] afferentArray1 = afferentArray[i];
-//                        for (int j = 0; j < afferentArray1.length; j++) {
-//                            if (j != dependencyID) {
-//                                if (afferentArray1[j] != 0) {
-//                                    afferentCoupling++;
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return ((abstractClasses / totalClasses) + (efferentCoupling / (efferentCoupling + afferentCoupling))) / Math.sqrt(2);
-//    }
     public double getCouplingBetweenObjectClasses() {
         return couplingBetweenObjectClasses;
     }
@@ -210,7 +174,5 @@ public class FitnessMetrics {
     public String toString() {
         return "FitnessMetrics{" + "couplingBetweenObjectClasses=" + couplingBetweenObjectClasses + ", cohesionBetweenObjectClasses=" + cohesionBetweenObjectClasses + ", weightedMethodsPerClass=" + weightedMethodsPerClass + '}';
     }
-
-  
 
 }

@@ -23,6 +23,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -46,6 +47,8 @@ public class FXMLDocumentController implements Initializable {
     int generation = 0;
     MetaModel original;
 
+     Stage stage = new Stage();
+    
     @FXML
     private Button generateButton;
     @FXML
@@ -98,9 +101,6 @@ public class FXMLDocumentController implements Initializable {
             int populationMember = evolvePopulation.indexOf(model);
             XYChart.Series<String, Number> series = new XYChart.Series();
             series.setName(String.valueOf("N." + populationMember));
-          //  System.out.println("Cohesion " + model.getFitness().getCohesionBetweenObjectClasses());
-           // System.out.println("Coupling " + model.getFitness().getCouplingBetweenObjectClasses());
-          //  System.out.println("Methods\nDistribution " + model.getFitness().getWeightedMethodsPerClass());
             series.getData().add(new XYChart.Data<>("Cohesion", model.getFitness().getCohesionBetweenObjectClasses()));
             series.getData().add(new XYChart.Data<>("Coupling", model.getFitness().getCouplingBetweenObjectClasses()));
             series.getData().add(new XYChart.Data<>("Methods\nDistribution", model.getFitness().getWeightedMethodsPerClass()));
@@ -154,15 +154,17 @@ public class FXMLDocumentController implements Initializable {
                 engine.setJavaScriptEnabled(true);
                 engine.load("File:///" + view.getAbsolutePath());
 
+                Label cohesion = new Label("cohesion /" + model.getFitness().getCohesionBetweenObjectClasses());
+                Label coupling = new Label("coupling /" +  model.getFitness().getCouplingBetweenObjectClasses());
+                Label WMPC = new Label("WMPC /" +  model.getFitness().getWeightedMethodsPerClass());
+                
                 final VBox wizBox = new VBox(5);
                 wizBox.setAlignment(Pos.CENTER);
-                wizBox.getChildren().setAll(webview);
+                wizBox.getChildren().setAll(webview, cohesion, coupling, WMPC);
 
                 Scene scene = new Scene(wizBox, 800, 600);
                 stage.setScene(scene);
-                stage.initModality(Modality.APPLICATION_MODAL);
-                stage.initOwner(chart.getScene().getWindow());
-                stage.showAndWait();
+                stage.show();
 
             }
         });

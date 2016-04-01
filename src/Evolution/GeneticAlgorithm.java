@@ -19,11 +19,10 @@ import java.util.Random;
  * @author Kieran
  */
 public class GeneticAlgorithm {
-    
+
     private ArrayList<MetaModel> population = new ArrayList();
     private int populationSize;
     private double mutationRate;
-   
 
     public void initialiseGA(MetaModel model, int populationSize, double mutationRate) {
         this.populationSize = populationSize;
@@ -103,9 +102,11 @@ public class GeneticAlgorithm {
             for (int i = 0; i < populationSize; i++) {
                 randNum -= (t - population.get(i).getFitness().getCouplingBetweenObjectClasses());
                 if (randNum < 0) {
+
                     chosen = population.get(i);
                 }
             }
+
             lowestCoupledModels.add(chosen);
 
             // finding the highest cohesive individuals
@@ -114,9 +115,11 @@ public class GeneticAlgorithm {
             for (int i = 0; i < populationSize; i++) {
                 randNum -= population.get(i).getFitness().getCohesionBetweenObjectClasses();
                 if (randNum < 0) {
+
                     chosen = population.get(i);
                 }
             }
+
             highestCohesiveModels.add(chosen);
 
             // finding the most significant distribution 
@@ -126,9 +129,11 @@ public class GeneticAlgorithm {
             for (int i = 0; i < populationSize; i++) {
                 randNum -= (t - population.get(i).getFitness().getWeightedMethodsPerClass());
                 if (randNum < 0) {
+
                     chosen = population.get(i);
                 }
             }
+
             bestMethodDistrobutionModels.add(chosen);
         }
 
@@ -210,7 +215,6 @@ public class GeneticAlgorithm {
     public void setMutationRate(double mutationRate) {
         this.mutationRate = mutationRate;
     }
-
 
     public ArrayList<MetaModel> getPopulation() {
         return population;

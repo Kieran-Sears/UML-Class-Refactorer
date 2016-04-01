@@ -5,6 +5,7 @@
  */
 package umlrefactorer;
 
+import DataTypes.CoreComponent;
 import Evolution.MetaModel;
 import Evolution.GeneticAlgorithm;
 import java.util.ArrayList;
@@ -20,17 +21,26 @@ public class EvolutionController {
     public void initialiseGA(MetaModel mm, int populationSize, float mutationRate) {
         GA = new GeneticAlgorithm();
         GA.initialiseGA(mm, populationSize, mutationRate);
-        //GA.printPopulationDependencies();
     }
 
     public ArrayList<MetaModel> evolvePopulation() {
         ArrayList<MetaModel> selection = GA.selection();
+        
         ArrayList<MetaModel> newPopulation = new ArrayList();
         for (MetaModel model : selection) {
-            MetaModel crossedAndMutated = GA.mutate(model);
+            MetaModel model2 = new MetaModel();
+            ArrayList<CoreComponent> components = new ArrayList();
+            for (CoreComponent component : model.getComponents()) {
+                components.add(component);
+            }
+            model2.setDependencies(model.getDependencies());
+            model2.setComponents(components);
+            MetaModel crossedAndMutated = GA.mutate(model2);
             crossedAndMutated.updateDependenciesAndFitness();
             newPopulation.add(crossedAndMutated);
         }
+        
+        
         GA.setPopulation(newPopulation);
         return newPopulation;
     }

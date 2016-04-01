@@ -8,46 +8,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="umlrefactorer.FXMLDocumentController">
+
+<AnchorPane prefHeight="740.0" prefWidth="1261.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="umlrefactorer.FXMLDocumentController">
    <children>
-      <ScrollPane layoutY="25.0" prefHeight="653.0" prefWidth="1065.0">
-         <content>
-            <TabPane prefHeight="676.0" prefWidth="1064.0">
-               <tabs>
-                  <Tab text="Fitness Overview">
-                     <content>
-                        <AnchorPane id="AnchorPane" prefHeight="628.0" prefWidth="887.0">
-                            <children>
-                                <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
-                              <VBox layoutX="16.0" layoutY="14.0" prefHeight="200.0" prefWidth="148.0" spacing="15.0">
-                                 <children>
-                                      <Button fx:id="generateButton" prefHeight="25.0" prefWidth="147.0" text="Evolve" />
-                                    <Label text="Population Size" />
-                                    <TextField fx:id="populationSize" text="1" />
-                                    <Label text="Number Of Generations" />
-                                    <TextField fx:id="numOfGenerations" text="1" />
-                                    <Label text="Mutation Rate" />
-                                    <TextField fx:id="mutationRate" text="0.05" />
-                                    <Button mnemonicParsing="false" onAction="#reset" prefHeight="25.0" prefWidth="147.0" text="Reset" />
-                                 </children>
-                              </VBox>
-                              <AreaChart fx:id="chart" layoutX="223.0" layoutY="29.0" prefHeight="567.0" prefWidth="808.0">
-                                <xAxis>
-                                  <CategoryAxis side="BOTTOM" />
-                                </xAxis>
-                                <yAxis>
-                                  <NumberAxis side="LEFT" />
-                                </yAxis>
-                              </AreaChart>
-                            </children>
-                        </AnchorPane>
-                     </content>
-                  </Tab>
-               </tabs>
-            </TabPane>
-         </content>
-      </ScrollPane>
-      <MenuBar layoutY="2.0" prefHeight="25.0" prefWidth="1065.0">
+      <MenuBar prefHeight="26.0" prefWidth="1261.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
@@ -66,5 +30,42 @@
           </Menu>
         </menus>
       </MenuBar>
+      <AnchorPane layoutY="25.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="687.0" prefWidth="1065.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+         <children>
+            <TabPane prefHeight="676.0" prefWidth="1064.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <tabs>
+                  <Tab text="Fitness Overview">
+                     <content>
+                        <AnchorPane id="AnchorPane" prefHeight="628.0" prefWidth="887.0">
+                            <children>
+                                <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
+                              <VBox layoutX="16.0" layoutY="14.0" prefHeight="200.0" prefWidth="148.0" spacing="15.0">
+                                 <children>
+                                      <Button fx:id="generateButton" prefHeight="25.0" prefWidth="147.0" text="Evolve" />
+                                    <Label text="Population Size" />
+                                    <TextField fx:id="populationSize" text="1" />
+                                    <Label text="Number Of Generations" />
+                                    <TextField fx:id="numOfGenerations" text="1" />
+                                    <Label text="Mutation Rate" />
+                                    <TextField fx:id="mutationRate" text="0.05" />
+                                    <Button mnemonicParsing="false" onAction="#reset" prefHeight="25.0" prefWidth="147.0" text="Reset" />
+                                 </children>
+                              </VBox>
+                              <AreaChart fx:id="chart" layoutX="223.0" layoutY="29.0" prefHeight="611.0" prefWidth="1000.0">
+                                <xAxis>
+                                  <CategoryAxis side="BOTTOM" />
+                                </xAxis>
+                                <yAxis>
+                                  <NumberAxis side="LEFT" />
+                                </yAxis>
+                              </AreaChart>
+                            </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+               </tabs>
+            </TabPane>
+         </children>
+      </AnchorPane>
    </children>
-</Pane>
+</AnchorPane>
