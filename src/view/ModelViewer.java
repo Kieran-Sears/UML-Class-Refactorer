@@ -8,6 +8,7 @@ package view;
 import DataTypes.Class.Attribute;
 import DataTypes.Class.Class;
 import DataTypes.Class.Operation;
+import DataTypes.Class.Parameter;
 import DataTypes.CoreComponent;
 import Evolution.MetaModel;
 import Evolution.RelationshipMatrix;
@@ -21,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -75,7 +77,7 @@ public class ModelViewer {
 //                }
 //                        
 //            }
-            String jointjsClassesScript = generateClassesData(classMethodsMap, classAttributesMap, classesPresent);
+            String jointjsClassesScript = generateClassesData(classMethodsMap, classAttributesMap, classesPresent, model.getDependencies());
             String jointjsCouplingScript = getCouplingData(model.getDependencies(), classesPresent);
             return generateHTMLView(jointjsClassesScript, jointjsCouplingScript);
         }
@@ -85,7 +87,7 @@ public class ModelViewer {
 
     public String generateClassesData(HashMap<DataTypes.Class.Class, ArrayList<DataTypes.Class.Operation>> classMethodsMap,
             HashMap<DataTypes.Class.Class, ArrayList<DataTypes.Class.Attribute>> classAttributesMap,
-            ArrayList<DataTypes.Class.Class> classesPresent) {
+            ArrayList<DataTypes.Class.Class> classesPresent, RelationshipMatrix matrix) {
 
         String jointjsClassesScript = "";
         double xpos = 0, ypos = 0, height = 0;
@@ -117,7 +119,7 @@ public class ModelViewer {
 
             String textToAdd = get.getName()
                     + ": new uml.Class({position: { x:"
-                    + xpos + "  , y: " + ypos + "},size: { width: 150, height: " + height + " },name:'"
+                    + xpos + "  , y: " + ypos + "},size: { width: 200, height: " + height + " },name:'"
                     + get.getName() + "',attributes: [";
 
             if (classAttributesMap.containsKey(get)) {
@@ -136,7 +138,20 @@ public class ModelViewer {
                 ArrayList<Operation> memberslist = classMethodsMap.get(get);
                 for (int j = 0; j < memberslist.size(); j++) {
                     Operation get1 = memberslist.get(j);
-                    textToAdd = textToAdd + "'" + get1.getName() + "'";
+                    textToAdd = textToAdd + "'" + get1.getName() + "(";
+                    Iterator<Parameter> iterator = get1.getParameters().iterator();
+                    while (iterator.hasNext()) {
+                        Parameter next = iterator.next();
+                        if (iterator.hasNext()){
+                       textToAdd += matrix.ReverseLookupClass( matrix.lookupClass(next.getType())) + ", ";
+                        }
+                        else {
+                         textToAdd += matrix.ReverseLookupClass( matrix.lookupClass(next.getType()));
+                        }
+                            
+                    }
+                            
+                          textToAdd +=   ")'";
                     if (j != memberslist.size() - 1) {
                         textToAdd = textToAdd + ",";
                     }

@@ -14,6 +14,8 @@ import DataTypes.Component;
 import DataTypes.CoreComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -87,7 +89,7 @@ public class RelationshipMatrix {
             }
         }
 
-        // initialise matrix and add dependencies
+        // initialise matrix
         this.associationMatrix = new int[classes.size()][classes.size()];
         int classCounter = 0;
         for (Class classe : classes) {
@@ -121,6 +123,19 @@ public class RelationshipMatrix {
                     addDependency(classee.getID(), attribute.getDependency());
                 }
             }
+        }
+        System.out.println("lookupTable");
+        Iterator<Map.Entry<String, Integer>> iterator = lookupTable.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Integer> next = iterator.next();
+            System.out.println(next.getKey() + "/" + next.getValue());
+        }
+        
+        System.out.println("reverseLookupTable");
+          Iterator<Map.Entry<Integer, String>> iterator2 = reverseLookupTable.entrySet().iterator();
+        while (iterator2.hasNext()) {
+            Map.Entry<Integer, String> next = iterator2.next();
+            System.out.println(next.getKey() + "/" + next.getValue());
         }
     }
 
