@@ -21,11 +21,11 @@ import org.apache.commons.math3.distribution.ChiSquaredDistribution;
  */
 public class FitnessMetrics {
 
-    RelationshipMatrix dependencies;
-    ArrayList<CoreComponent> components;
-    double couplingBetweenObjectClasses;
-    double cohesionBetweenObjectClasses;
-    double weightedMethodsPerClass;
+   private RelationshipMatrix dependencies;
+   private ArrayList<CoreComponent> components;
+    private double couplingBetweenObjectClasses;
+  private  double cohesionBetweenObjectClasses;
+  private  double weightedMethodsPerClass;
     // double distanceFromMainSequence;
 
     public FitnessMetrics(RelationshipMatrix dependencies, ArrayList<CoreComponent> components) {
@@ -158,6 +158,10 @@ public class FitnessMetrics {
         return cumulativeProbability;
     }
 
+    public double getOverallFitness(){
+            return cohesionBetweenObjectClasses + (100 - couplingBetweenObjectClasses) + weightedMethodsPerClass;
+    }
+    
     public double getCouplingBetweenObjectClasses() {
         return couplingBetweenObjectClasses;
     }

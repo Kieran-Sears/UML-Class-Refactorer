@@ -54,120 +54,150 @@ public class GeneticAlgorithm {
     }
 
     public ArrayList<MetaModel> selection() {
+        ArrayList<MetaModel> best = new ArrayList();
+        MetaModel previousBestInd = population.get(0);
         double randNum;
-        int remainder = populationSize % 3;
-        int divisor = populationSize - remainder;
-        int count = divisor / 3;
+        double totalFitness = 0;
+        MetaModel chosen = null;
 
-        ArrayList<MetaModel> bestIndividuals = new ArrayList();
-        ArrayList<MetaModel> lowestCoupledModels = new ArrayList();
-        ArrayList<MetaModel> highestCohesiveModels = new ArrayList();
-        ArrayList<MetaModel> bestMethodDistrobutionModels = new ArrayList();
-
-        // objective find the individuals with the lowest coupling and the highest cohesion
         for (MetaModel individual : population) {
-            MetaModel chosen = null;
-            double totalCouplingFitness = 0;
-            double totalCohesionFitness = 0;
-            double totalWeightedMethodsFitness = 0;
-            double coupleMax = 0;
-            double coupleMin = -1;
-            double WMPCMax = 0;
-            double WMPCMin = -1;
-
-            double t;
-
-            totalCohesionFitness += individual.getFitness().getCohesionBetweenObjectClasses();
-
-            totalCouplingFitness += individual.getFitness().getCouplingBetweenObjectClasses();
-            if (coupleMax < individual.getFitness().getCohesionBetweenObjectClasses()) {
-                coupleMax = individual.getFitness().getCohesionBetweenObjectClasses();
+            totalFitness += individual.getFitness().getOverallFitness();
+            if ( individual.getFitness().getOverallFitness() > previousBestInd.getFitness().getOverallFitness()) {
+            previousBestInd = individual;
             }
-            if (coupleMin > individual.getFitness().getCohesionBetweenObjectClasses() || coupleMin == -1) {
-                coupleMin = individual.getFitness().getCohesionBetweenObjectClasses();
-            }
+        }
 
-            totalWeightedMethodsFitness += individual.getFitness().getWeightedMethodsPerClass();
-            if (WMPCMax < individual.getFitness().getWeightedMethodsPerClass()) {
-                WMPCMax = individual.getFitness().getWeightedMethodsPerClass();
-            }
-            if (WMPCMin > individual.getFitness().getWeightedMethodsPerClass() || coupleMin == -1) {
-                WMPCMin = individual.getFitness().getWeightedMethodsPerClass();
-            }
-
-            // finding the lowest coupled individuals
-            randNum = (double) (Math.random() * totalCouplingFitness);
+        best.add(previousBestInd);
+        
+        for (int i = 0; i < populationSize -1; i++) {
+            randNum = (double) (Math.random() * totalFitness);
             chosen = population.get(0);
-            t = coupleMax + coupleMin;
-            for (int i = 0; i < populationSize; i++) {
-                randNum -= (t - population.get(i).getFitness().getCouplingBetweenObjectClasses());
+            for (int j = 0; j < populationSize; j++) {
+                randNum -= population.get(j).getFitness().getOverallFitness();
                 if (randNum < 0) {
-
                     chosen = population.get(i);
                 }
             }
-
-            lowestCoupledModels.add(chosen);
-
-            // finding the highest cohesive individuals
-            randNum = (double) (Math.random() * totalCohesionFitness);
-            chosen = population.get(0);
-            for (int i = 0; i < populationSize; i++) {
-                randNum -= population.get(i).getFitness().getCohesionBetweenObjectClasses();
-                if (randNum < 0) {
-
-                    chosen = population.get(i);
-                }
-            }
-
-            highestCohesiveModels.add(chosen);
-
-            // finding the most significant distribution 
-            randNum = (double) (Math.random() * totalWeightedMethodsFitness);
-            chosen = population.get(0);
-            t = WMPCMax + WMPCMin;
-            for (int i = 0; i < populationSize; i++) {
-                randNum -= (t - population.get(i).getFitness().getWeightedMethodsPerClass());
-                if (randNum < 0) {
-
-                    chosen = population.get(i);
-                }
-            }
-
-            bestMethodDistrobutionModels.add(chosen);
+            best.add(chosen);
         }
 
-        // adding chosen from each group to the final parent selection
-        for (int i = 0; i < count; i++) {
-            bestIndividuals.add(lowestCoupledModels.get(i));
-            bestIndividuals.add(highestCohesiveModels.get(i));
-            bestIndividuals.add(bestMethodDistrobutionModels.get(i));
-        }
-
-        while (true) {
-            if (remainder == 0) {
-                break;
-            } else {
-                bestIndividuals.add(lowestCoupledModels.get((int) (Math.random() * populationSize)));
-                remainder--;
-            }
-            if (remainder == 0) {
-                break;
-            } else {
-                bestIndividuals.add(highestCohesiveModels.get((int) (Math.random() * populationSize)));
-                remainder--;
-            }
-            if (remainder == 0) {
-                break;
-            } else {
-                bestIndividuals.add(bestMethodDistrobutionModels.get((int) (Math.random() * populationSize)));
-                remainder--;
-            }
-
-        }
-        return bestIndividuals;
+        return best;
     }
 
+//    public ArrayList<MetaModel> selection() {
+//        double randNum;
+//        int remainder = populationSize % 3;
+//        int divisor = populationSize - remainder;
+//        int count = divisor / 3;
+//
+//        ArrayList<MetaModel> bestIndividuals = new ArrayList();
+//        ArrayList<MetaModel> lowestCoupledModels = new ArrayList();
+//        ArrayList<MetaModel> highestCohesiveModels = new ArrayList();
+//        ArrayList<MetaModel> bestMethodDistrobutionModels = new ArrayList();
+//
+//        // objective find the individuals with the lowest coupling and the highest cohesion
+//        for (MetaModel individual : population) {
+//            MetaModel chosen = null;
+//            double totalCouplingFitness = 0;
+//            double totalCohesionFitness = 0;
+//            double totalWeightedMethodsFitness = 0;
+//            double coupleMax = 0;
+//            double coupleMin = -1;
+//            double WMPCMax = 0;
+//            double WMPCMin = -1;
+//
+//            double t;
+//
+//            totalCohesionFitness += individual.getFitness().getCohesionBetweenObjectClasses();
+//
+//            totalCouplingFitness += individual.getFitness().getCouplingBetweenObjectClasses();
+//            if (coupleMax < individual.getFitness().getCohesionBetweenObjectClasses()) {
+//                coupleMax = individual.getFitness().getCohesionBetweenObjectClasses();
+//            }
+//            if (coupleMin > individual.getFitness().getCohesionBetweenObjectClasses() || coupleMin == -1) {
+//                coupleMin = individual.getFitness().getCohesionBetweenObjectClasses();
+//            }
+//
+//            totalWeightedMethodsFitness += individual.getFitness().getWeightedMethodsPerClass();
+//            if (WMPCMax < individual.getFitness().getWeightedMethodsPerClass()) {
+//                WMPCMax = individual.getFitness().getWeightedMethodsPerClass();
+//            }
+//            if (WMPCMin > individual.getFitness().getWeightedMethodsPerClass() || coupleMin == -1) {
+//                WMPCMin = individual.getFitness().getWeightedMethodsPerClass();
+//            }
+//
+//            // finding the lowest coupled individuals
+//            randNum = (double) (Math.random() * totalCouplingFitness);
+//            chosen = population.get(0);
+//            t = coupleMax + coupleMin;
+//            for (int i = 0; i < populationSize; i++) {
+//                randNum -= (t - population.get(i).getFitness().getCouplingBetweenObjectClasses());
+//                if (randNum < 0) {
+//
+//                    chosen = population.get(i);
+//                }
+//            }
+//
+//            lowestCoupledModels.add(chosen);
+//
+//            // finding the highest cohesive individuals
+//            randNum = (double) (Math.random() * totalCohesionFitness);
+//            chosen = population.get(0);
+//            for (int i = 0; i < populationSize; i++) {
+//                randNum -= population.get(i).getFitness().getCohesionBetweenObjectClasses();
+//                if (randNum < 0) {
+//
+//                    chosen = population.get(i);
+//                }
+//            }
+//
+//            highestCohesiveModels.add(chosen);
+//
+//            // finding the most significant distribution 
+//            randNum = (double) (Math.random() * totalWeightedMethodsFitness);
+//            chosen = population.get(0);
+//            t = WMPCMax + WMPCMin;
+//            for (int i = 0; i < populationSize; i++) {
+//                randNum -= (t - population.get(i).getFitness().getWeightedMethodsPerClass());
+//                if (randNum < 0) {
+//
+//                    chosen = population.get(i);
+//                }
+//            }
+//
+//            bestMethodDistrobutionModels.add(chosen);
+//        }
+//
+//        // adding chosen from each group to the final parent selection
+//        for (int i = 0; i < count; i++) {
+//            bestIndividuals.add(lowestCoupledModels.get(i));
+//            bestIndividuals.add(highestCohesiveModels.get(i));
+//            bestIndividuals.add(bestMethodDistrobutionModels.get(i));
+//        }
+//
+//        while (true) {
+//            if (remainder == 0) {
+//                break;
+//            } else {
+//                bestIndividuals.add(lowestCoupledModels.get((int) (Math.random() * populationSize)));
+//                remainder--;
+//            }
+//            if (remainder == 0) {
+//                break;
+//            } else {
+//                bestIndividuals.add(highestCohesiveModels.get((int) (Math.random() * populationSize)));
+//                remainder--;
+//            }
+//            if (remainder == 0) {
+//                break;
+//            } else {
+//                bestIndividuals.add(bestMethodDistrobutionModels.get((int) (Math.random() * populationSize)));
+//                remainder--;
+//            }
+//
+//        }
+//        return bestIndividuals;
+//    }
     public MetaModel mutate(MetaModel model) {
 
         HashMap<Integer, Integer> indexes = new HashMap();
