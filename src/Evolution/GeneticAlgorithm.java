@@ -23,6 +23,7 @@ public class GeneticAlgorithm {
     private ArrayList<MetaModel> population = new ArrayList();
     private int populationSize;
     private double mutationRate;
+    private MetaModel currentBestIndividual;
 
     public void initialiseGA(MetaModel model, int populationSize, double mutationRate) {
         this.populationSize = populationSize;
@@ -55,19 +56,21 @@ public class GeneticAlgorithm {
 
     public ArrayList<MetaModel> selection() {
         ArrayList<MetaModel> best = new ArrayList();
-        MetaModel previousBestInd = population.get(0);
+        if (currentBestIndividual == null) {
+        currentBestIndividual = population.get(0);
+        }
         double randNum;
         double totalFitness = 0;
         MetaModel chosen = null;
 
         for (MetaModel individual : population) {
             totalFitness += individual.getFitness().getOverallFitness();
-            if ( individual.getFitness().getOverallFitness() > previousBestInd.getFitness().getOverallFitness()) {
-            previousBestInd = individual;
+            if ( individual.getFitness().getOverallFitness() > currentBestIndividual.getFitness().getOverallFitness()) {
+            currentBestIndividual = individual;
             }
         }
 
-        best.add(previousBestInd);
+        best.add(currentBestIndividual);
         
         for (int i = 0; i < populationSize -1; i++) {
             randNum = (double) (Math.random() * totalFitness);
@@ -262,10 +265,5 @@ public class GeneticAlgorithm {
         this.populationSize = populationSize;
     }
 
-// end of getters and setters
-    public void printPopulationDependencies() {
-        for (MetaModel pop : population) {
-            System.out.println(pop.getDependencies().toString());
-        }
-    }
+    
 }

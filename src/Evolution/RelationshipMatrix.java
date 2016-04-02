@@ -124,19 +124,6 @@ public class RelationshipMatrix {
                 }
             }
         }
-        System.out.println("lookupTable");
-        Iterator<Map.Entry<String, Integer>> iterator = lookupTable.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, Integer> next = iterator.next();
-            System.out.println(next.getKey() + "/" + next.getValue());
-        }
-        
-        System.out.println("reverseLookupTable");
-          Iterator<Map.Entry<Integer, String>> iterator2 = reverseLookupTable.entrySet().iterator();
-        while (iterator2.hasNext()) {
-            Map.Entry<Integer, String> next = iterator2.next();
-            System.out.println(next.getKey() + "/" + next.getValue());
-        }
     }
 
     private void addDependency(String sourceID, String targetID) {

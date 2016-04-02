@@ -64,19 +64,6 @@ public class ModelViewer {
 
             }
 
-            // for debugging
-//            for (DataTypes.Class.Class classee : classesPresent) {
-//                System.out.println("\n" + classee.getName());
-//                ArrayList<Operation> methods = classMethodsMap.get(classee);
-//                ArrayList<Attribute> attributes = classAttributesMap.get(classee);
-//                        for (Attribute attribute : attributes) {
-//                            System.out.println(attribute.getName());
-//                }
-//                        for (Operation method : methods) {
-//                            System.out.println(method.getName());
-//                }
-//                        
-//            }
             String jointjsClassesScript = generateClassesData(classMethodsMap, classAttributesMap, classesPresent, model.getDependencies());
             String jointjsCouplingScript = getCouplingData(model.getDependencies(), classesPresent);
             return generateHTMLView(jointjsClassesScript, jointjsCouplingScript);

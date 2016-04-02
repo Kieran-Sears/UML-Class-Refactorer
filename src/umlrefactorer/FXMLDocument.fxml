@@ -8,7 +8,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane prefHeight="740.0" prefWidth="1261.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="umlrefactorer.FXMLDocumentController">
    <children>
       <MenuBar prefHeight="26.0" prefWidth="1261.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -45,23 +44,39 @@
                                     <Label text="Population Size" />
                                     <TextField fx:id="populationSize" text="1" />
                                     <Label text="Number Of Generations" />
-                                    <TextField fx:id="numOfGenerations" text="1" />
+                                    <TextField fx:id="numOfGens" text="1" />
                                     <Label text="Mutation Rate" />
                                     <TextField fx:id="mutationRate" text="0.05" />
                                     <Button mnemonicParsing="false" onAction="#reset" prefHeight="25.0" prefWidth="147.0" text="Reset" />
                                  </children>
                               </VBox>
-                              <AreaChart fx:id="chart" layoutX="223.0" layoutY="29.0" prefHeight="611.0" prefWidth="1000.0">
+                              <LineChart fx:id="overallFitnessChart" layoutX="232.0" layoutY="27.0" prefHeight="607.0" prefWidth="972.0">
+                                <xAxis>
+                                  <NumberAxis side="BOTTOM" />
+                                </xAxis>
+                                <yAxis>
+                                  <NumberAxis side="LEFT" />
+                                </yAxis>
+                              </LineChart>
+                            </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+                  <Tab text="Current Generation">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <StackedAreaChart fx:id="eliteFitnessChart" layoutX="71.0" layoutY="41.0" prefHeight="567.0" prefWidth="1058.0">
                                 <xAxis>
                                   <CategoryAxis side="BOTTOM" />
                                 </xAxis>
                                 <yAxis>
                                   <NumberAxis side="LEFT" />
                                 </yAxis>
-                              </AreaChart>
-                            </children>
+                              </StackedAreaChart>
+                           </children>
                         </AnchorPane>
-                     </content>
+                    </content>
                   </Tab>
                </tabs>
             </TabPane>

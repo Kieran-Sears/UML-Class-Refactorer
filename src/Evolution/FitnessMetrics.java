@@ -114,7 +114,6 @@ public class FitnessMetrics {
             }
         }
     double percent =  (runningTotal / ((numOfClasses* (numOfClasses -1)) / 2)) * 100;
-        System.out.println("percent " + percent);
         return percent;
     }
 
