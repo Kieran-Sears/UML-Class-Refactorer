@@ -18,16 +18,15 @@ public class EvolutionController {
 
     GeneticAlgorithm GA;
 
-    public void initialiseGA(MetaModel mm, int populationSize, float mutationRate) {
+    public void initialiseGA(MetaModel mm, int populationSize, Boolean randomize) {
         GA = new GeneticAlgorithm();
-        GA.initialiseGA(mm, populationSize, mutationRate);
+        GA.initialiseGA(mm, populationSize, randomize);
     }
 
-    public ArrayList<MetaModel> evolvePopulation(int numberOfGens) {
-        ArrayList<MetaModel> newPopulation = null;
-        for (int i = 0; i < numberOfGens; i++) {
-            newPopulation = new ArrayList();
-            ArrayList<MetaModel> selection = GA.selection();
+    public ArrayList<MetaModel> evolvePopulation(Double mutationRate, int populationSize) {
+   
+            ArrayList<MetaModel> newPopulation = new ArrayList();
+            ArrayList<MetaModel> selection = GA.selection(populationSize);
             for (MetaModel model : selection) {
                 MetaModel model2 = new MetaModel();
                 ArrayList<CoreComponent> components = new ArrayList();
@@ -36,12 +35,12 @@ public class EvolutionController {
                 }
                 model2.setDependencies(model.getDependencies());
                 model2.setComponents(components);
-                MetaModel crossedAndMutated = GA.mutate(model2);
+                MetaModel crossedAndMutated = GA.mutate(model2, mutationRate);
                 crossedAndMutated.updateDependenciesAndFitness();
                 newPopulation.add(crossedAndMutated);
             }
             GA.setPopulation(newPopulation);
-        }
+  
 
         return newPopulation;
     }

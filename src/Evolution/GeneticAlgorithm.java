@@ -21,21 +21,22 @@ import java.util.Random;
 public class GeneticAlgorithm {
 
     private ArrayList<MetaModel> population = new ArrayList();
-    private int populationSize;
-    private double mutationRate;
+   
+  
     private MetaModel currentBestIndividual;
 
-    public void initialiseGA(MetaModel model, int populationSize, double mutationRate) {
-        this.populationSize = populationSize;
-        this.mutationRate = mutationRate;
+    public void initialiseGA(MetaModel model, int populationSize, Boolean randomized) {
+   
 
         // add random new individuals to the population, randomness is important for initial exploration of search space
         for (int i = 1; i < populationSize; i++) {
+        
             MetaModel newModel = new MetaModel();
             ArrayList<CoreComponent> components = new ArrayList();
             for (CoreComponent component : model.getComponents()) {
                 components.add(component);
             }
+            if (randomized){
             ArrayList<CoreComponent> newComponents = new ArrayList();
             newComponents.add(components.get(0));
             components.remove(0);
@@ -45,34 +46,39 @@ public class GeneticAlgorithm {
                 newComponents.add(components.get(index));
                 components.remove(index);
             }
+             newModel.setComponents(newComponents);
+            }
+            else {
+                newModel.setComponents(components);
+            }
             newModel.setDependencies(model.getDependencies());
-            newModel.setComponents(newComponents);
             newModel.updateDependenciesAndFitness();
             population.add(newModel);
+            
         }
 
         population.add(model);
     }
 
-    public ArrayList<MetaModel> selection() {
+    public ArrayList<MetaModel> selection(int populationSize) {
         ArrayList<MetaModel> best = new ArrayList();
-        if (currentBestIndividual == null) {
-        currentBestIndividual = population.get(0);
-        }
+//        if (currentBestIndividual == null) {
+//        currentBestIndividual = population.get(0);
+//        }
         double randNum;
         double totalFitness = 0;
         MetaModel chosen = null;
 
         for (MetaModel individual : population) {
             totalFitness += individual.getFitness().getOverallFitness();
-            if ( individual.getFitness().getOverallFitness() > currentBestIndividual.getFitness().getOverallFitness()) {
-            currentBestIndividual = individual;
-            }
+//            if ( individual.getFitness().getOverallFitness() > currentBestIndividual.getFitness().getOverallFitness()) {
+//            currentBestIndividual = individual;
+//            }
         }
 
-        best.add(currentBestIndividual);
+//        best.add(currentBestIndividual);
         
-        for (int i = 0; i < populationSize -1; i++) {
+        for (int i = 0; i < populationSize ; i++) { // -number for elite reintroduced members
             randNum = (double) (Math.random() * totalFitness);
             chosen = population.get(0);
             for (int j = 0; j < populationSize; j++) {
@@ -87,6 +93,9 @@ public class GeneticAlgorithm {
         return best;
     }
 
+    
+    
+    
 //    public ArrayList<MetaModel> selection() {
 //        double randNum;
 //        int remainder = populationSize % 3;
@@ -201,7 +210,7 @@ public class GeneticAlgorithm {
 //        }
 //        return bestIndividuals;
 //    }
-    public MetaModel mutate(MetaModel model) {
+    public MetaModel mutate(MetaModel model, Double mutationRate) {
 
         HashMap<Integer, Integer> indexes = new HashMap();
         ArrayList<CoreComponent> chromosome = model.getComponents();
@@ -241,13 +250,6 @@ public class GeneticAlgorithm {
 
     // end of evolution operators
     // getters and setters
-    public double getMutationRate() {
-        return mutationRate;
-    }
-
-    public void setMutationRate(double mutationRate) {
-        this.mutationRate = mutationRate;
-    }
 
     public ArrayList<MetaModel> getPopulation() {
         return population;
@@ -255,14 +257,6 @@ public class GeneticAlgorithm {
 
     public void setPopulation(ArrayList<MetaModel> population) {
         this.population = population;
-    }
-
-    public int getPopulationSize() {
-        return populationSize;
-    }
-
-    public void setPopulationSize(int populationSize) {
-        this.populationSize = populationSize;
     }
 
     

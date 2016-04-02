@@ -14,8 +14,6 @@ import DataTypes.Component;
 import DataTypes.CoreComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -28,28 +26,6 @@ public class RelationshipMatrix {
     private final HashMap<String, Integer> lookupTable = new HashMap();
     public int[][] associationMatrix;
 
-    public RelationshipMatrix(ArrayList<CoreComponent> components, ArrayList<Association> associations) {
-
-        // get number of classes for matrix
-        ArrayList<Class> classes = new ArrayList();
-        for (Component component : components) {
-            if (component instanceof Class) {
-                classes.add((Class) component);
-            }
-        }
-
-        // initialise matrix and add dependencies
-        this.associationMatrix = new int[classes.size()][classes.size()];
-        int classCounter = 0;
-        for (Class classe : classes) {
-            lookupTable.put(classe.getID(), classCounter);
-            reverseLookupTable.put(classCounter, classe.getName());
-            for (int j = 0; j < associationMatrix.length; j++) {
-                associationMatrix[classCounter][j] = 0;
-            }
-            classCounter++;
-        }
-    }
 
     public ArrayList<CoreComponent> changeAssociationsToAttributes(ArrayList<CoreComponent> components, ArrayList<Association> associations){
       // turn aggregations and compositions into dependencies
@@ -81,6 +57,9 @@ public class RelationshipMatrix {
     
     public void sortMethodDependencies(ArrayList<CoreComponent> components) {
         
+        lookupTable.clear();
+        reverseLookupTable.clear();
+        
         // get number of classes for matrix
         ArrayList<Class> classes = new ArrayList();
         for (Component component : components) {
@@ -101,10 +80,11 @@ public class RelationshipMatrix {
             classCounter++;
         }
         
+        System.out.println("/////////////////");
         // add method dependencies
         DataTypes.Class.Class classee = null;
         for (Component component : components) {
-            // get the class the operation belongs to
+            // search each class in turn
             if (component instanceof DataTypes.Class.Class) {
                 classee = (DataTypes.Class.Class) component;
             }
@@ -115,15 +95,18 @@ public class RelationshipMatrix {
                 for (Parameter parameter : parameters) {
                     // each param that uses another class is a dependency
                     addDependency(classee.getID(), parameter.getType());
+                    System.out.println(classee.getName() + " dependent on " + reverseLookupTable.get(lookupTable.get( parameter.getType() ) ) + " because of "   + operation.getName() + " (" + reverseLookupTable.get(lookupTable.get( parameter.getType() ) ) + ")"  );
                 }
             }
             if (component instanceof Attribute) {
                 Attribute attribute = (Attribute) component;
                 if (attribute.getDependency() != null) {
                     addDependency(classee.getID(), attribute.getDependency());
+                     System.out.println(classee.getName() + " dependent on " +   reverseLookupTable.get(lookupTable.get( attribute.getDependency() ) ) + " because of " + attribute.getName() );
                 }
             }
         }
+        System.out.println( this.toString());
     }
 
     private void addDependency(String sourceID, String targetID) {

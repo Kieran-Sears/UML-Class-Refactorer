@@ -38,7 +38,7 @@
                         <AnchorPane id="AnchorPane" prefHeight="628.0" prefWidth="887.0">
                             <children>
                                 <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
-                              <VBox layoutX="16.0" layoutY="14.0" prefHeight="200.0" prefWidth="148.0" spacing="15.0">
+                              <VBox layoutX="16.0" layoutY="14.0" prefHeight="407.0" prefWidth="148.0" spacing="15.0">
                                  <children>
                                       <Button fx:id="generateButton" prefHeight="25.0" prefWidth="147.0" text="Evolve" />
                                     <Label text="Population Size" />
@@ -48,6 +48,7 @@
                                     <Label text="Mutation Rate" />
                                     <TextField fx:id="mutationRate" text="0.05" />
                                     <Button mnemonicParsing="false" onAction="#reset" prefHeight="25.0" prefWidth="147.0" text="Reset" />
+                                    <CheckBox fx:id="randomizeInitialization" mnemonicParsing="false" prefHeight="58.0" prefWidth="128.0" text="Randomize model on Initialization" wrapText="true" />
                                  </children>
                               </VBox>
                               <LineChart fx:id="overallFitnessChart" layoutX="232.0" layoutY="27.0" prefHeight="607.0" prefWidth="972.0">
@@ -66,14 +67,14 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <StackedAreaChart fx:id="eliteFitnessChart" layoutX="71.0" layoutY="41.0" prefHeight="567.0" prefWidth="1058.0">
+                              <AreaChart fx:id="eliteFitnessChart" layoutX="186.0" layoutY="49.0" prefHeight="584.0" prefWidth="1024.0">
                                 <xAxis>
                                   <CategoryAxis side="BOTTOM" />
                                 </xAxis>
                                 <yAxis>
                                   <NumberAxis side="LEFT" />
                                 </yAxis>
-                              </StackedAreaChart>
+                              </AreaChart>
                            </children>
                         </AnchorPane>
                     </content>

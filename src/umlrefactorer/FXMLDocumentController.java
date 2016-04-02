@@ -21,11 +21,11 @@ import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.StackedAreaChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -57,17 +57,21 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private LineChart<Number, Number> overallFitnessChart;
     @FXML
-    private StackedAreaChart<String, Number> eliteFitnessChart;
+    private AreaChart<String, Number> eliteFitnessChart;
     @FXML
     private TextField populationSize;
     @FXML
     private TextField numOfGens;
     @FXML
     private TextField mutationRate;
+    @FXML 
+    private CheckBox randomizeInitialization;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
+        eliteFitnessChart.getYAxis().autoRangingProperty().setValue(false);
+        ((NumberAxis) eliteFitnessChart.getYAxis()).setUpperBound(100);
+        ((NumberAxis) eliteFitnessChart.getYAxis()).setTickUnit(10);
         parser = new ParserController();
         generateButton.setText("Generate Population");
         generateButton.setOnAction((event) -> {
@@ -84,27 +88,23 @@ public class FXMLDocumentController implements Initializable {
             alert.setContentText("No XMI file has been loaded, Select a Model for Evolving.");
             alert.showAndWait();
         } else {
-            overallFitnessChart.getData().clear();
-            int popSize = Integer.parseInt(populationSize.getText());
-            float mutRate = Float.parseFloat(mutationRate.getText());
-            evolution.initialiseGA(original, popSize, mutRate);
-            overallFitnessList.add(overallFitnessSeries);
-            overallFitnessChart.setData(overallFitnessList);
-            ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation(Integer.parseInt(numOfGens.getText()));
-            updateOverallChart(evolvePopulation);
-            updateEliteChart(evolvePopulation);
+            evolution.initialiseGA(original, Integer.parseInt(populationSize.getText()), randomizeInitialization.isSelected());
             generateButton.setText("Next Generation");
             generateButton.setOnAction((event) -> {
                 iterate();
             });
+            iterate();
         }
     }
 
     public void iterate() {
-        generation++;
-        ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation(Integer.parseInt(numOfGens.getText()));
-        updateOverallChart(evolvePopulation);
-        updateEliteChart(evolvePopulation);
+        for (int i = 0; i < Integer.parseInt(numOfGens.getText()); i++) {
+            generation++;
+            ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation(Double.valueOf(mutationRate.getText()), Integer.parseInt(populationSize.getText()));
+            updateOverallChart(evolvePopulation);
+            updateEliteChart(evolvePopulation);
+        }
+
     }
 
     public void updateOverallChart(ArrayList<MetaModel> evolvePopulation) {
@@ -121,18 +121,16 @@ public class FXMLDocumentController implements Initializable {
             int populationMember = evolvePopulation.indexOf(model);
             XYChart.Series<String, Number> series = new XYChart.Series();
             series.setName(String.valueOf("N." + populationMember));
-            System.out.println("Cohesion" + model.getFitness().getCohesionBetweenObjectClasses()
-            + "Coupling" + model.getFitness().getCouplingBetweenObjectClasses()
-            + "Methods\nDistribution" + model.getFitness().getWeightedMethodsPerClass());
-            series.getData().add(new XYChart.Data<>("Methods\nDistribution", model.getFitness().getWeightedMethodsPerClass()));
+           // System.out.println("Cohesion" + model.getFitness().getCohesionBetweenObjectClasses()
+               //     + "Coupling" + model.getFitness().getCouplingBetweenObjectClasses()
+              //      + "Methods\nDistribution" + model.getFitness().getWeightedMethodsPerClass());
+
             series.getData().add(new XYChart.Data<>("Cohesion", model.getFitness().getCohesionBetweenObjectClasses()));
             series.getData().add(new XYChart.Data<>("Coupling", model.getFitness().getCouplingBetweenObjectClasses()));
             series.getData().add(new XYChart.Data<>("Methods\nDistribution", model.getFitness().getWeightedMethodsPerClass()));
             observableList.add(series);
             eliteFitnessChart.setData(observableList);
-            eliteFitnessChart.getYAxis().autoRangingProperty().setValue(false);
-            ((NumberAxis) eliteFitnessChart.getYAxis()).setUpperBound(100);
-            ((NumberAxis) eliteFitnessChart.getYAxis()).setTickUnit(10);
+
             setOnMouseEventsOnSeries(series.getNode(), model);
         }
 
@@ -158,11 +156,12 @@ public class FXMLDocumentController implements Initializable {
             generateButton.setOnAction((event) -> {
                 initialiseGA();
             });
-            XYChart.Series<Number, Number> series1 = new XYChart.Series();
-            series1.getData().add(new XYChart.Data(generation, model.getFitness().getOverallFitness()));
-            overallFitnessChart.getData().add(series1);
+            overallFitnessChart.getData().clear();
+            overallFitnessList.add(overallFitnessSeries);
+            overallFitnessChart.setData(overallFitnessList);
             ArrayList<MetaModel> add = new ArrayList();
             add.add(model);
+            updateOverallChart(add);
             updateEliteChart(add);
         } catch (IllegalArgumentException e) {
             System.out.println("user cancelled loading file");
@@ -198,7 +197,7 @@ public class FXMLDocumentController implements Initializable {
             Label cohesion = new Label("cohesion /" + model.getFitness().getCohesionBetweenObjectClasses());
             Label coupling = new Label("coupling /" + model.getFitness().getCouplingBetweenObjectClasses());
             Label WMPC = new Label("WMPC /" + model.getFitness().getWeightedMethodsPerClass());
-            
+
             // render the scene
             HBox hBox = new HBox(10);
             hBox.setAlignment(Pos.CENTER);
@@ -215,18 +214,16 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     public void reset() {
-        if (original != null) {
-            overallFitnessChart.getData().clear();
-            XYChart.Series<Number, Number> series = new XYChart.Series();
-            series.getData().add(new XYChart.Data<>(generation, original.getFitness().getOverallFitness()));
-            overallFitnessChart.getData().add(series);
-            setOnMouseEventsOnSeries(series.getNode(), original);
-        }
+        generation = 0;
+        overallFitnessSeries.getData().clear();
+        ArrayList<MetaModel> add = new ArrayList();
+        add.add(original);
+        updateOverallChart(add);
+        updateEliteChart(add);
         parser = new ParserController();
         evolution = new EvolutionController();
         patterns = new DesignPatternsController();
         viewer = new ModelViewer();
-        generation = 0;
         generateButton.setText("Generate Population");
         generateButton.setOnAction((event) -> {
             initialiseGA();

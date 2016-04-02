@@ -26,19 +26,19 @@ public class MetaModel {
     // shows connections between classes
     private RelationshipMatrix dependencies;
     // holds all the methods attributes and classes
-    private ArrayList<CoreComponent> chromosome;
+    private ArrayList<CoreComponent> components;
     // a list of associations present (composition, aggregation, generalisation etc)
     private ArrayList<Association> associations;
 
     public void initialiseDependenciesAndFitness(){
-        dependencies = new RelationshipMatrix(chromosome, associations);
-        chromosome = dependencies.changeAssociationsToAttributes(chromosome, associations);
+        dependencies = new RelationshipMatrix();
+        components = dependencies.changeAssociationsToAttributes(components, associations);
         updateDependenciesAndFitness();
     }
     
     public void updateDependenciesAndFitness(){
-     dependencies.sortMethodDependencies(chromosome);
-     fitness = new FitnessMetrics(dependencies, chromosome);
+     dependencies.sortMethodDependencies(components);
+     fitness = new FitnessMetrics(dependencies, components);
     }
     
     
@@ -52,11 +52,11 @@ public class MetaModel {
     }
 
     public ArrayList<CoreComponent> getComponents() {
-        return chromosome;
+        return components;
     }
 
     public void setComponents(ArrayList<CoreComponent> components) {
-        this.chromosome = components;
+        this.components = components;
     }
 
     public ArrayList<Association> getAssociations() {
@@ -82,7 +82,7 @@ public class MetaModel {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(file, "UTF-8");
-                writer.println(chromosome.toString());
+                writer.println(components.toString());
                 writer.println(dependencies.toString());
                 writer.println(fitness.toString());
                 writer.println("\n##################################\n");
@@ -98,7 +98,7 @@ public class MetaModel {
     public void outputResultsToConsole() {
         String string = "";
             string += "\n''''''''''''''''''''''''''''''\n";
-            string += chromosome.toString();
+            string += components.toString();
             string += dependencies.toString();
             string += fitness.toString();
         System.out.println(string);
