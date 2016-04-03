@@ -5,6 +5,8 @@
  */
 package umlrefactorer;
 
+import Evolution.FitnessMetrics;
+import Evolution.GeneticAlgorithm;
 import Evolution.MetaModel;
 import java.io.File;
 import java.net.URL;
@@ -43,8 +45,9 @@ import view.ModelViewer;
  */
 public class FXMLDocumentController implements Initializable {
 
+    FitnessMetrics fitness;
     ParserController parser;
-    EvolutionController evolution;
+    GeneticAlgorithm evolution;
     DesignPatternsController patterns;
     ModelViewer viewer;
     int generation = 0;
@@ -100,7 +103,7 @@ public class FXMLDocumentController implements Initializable {
     public void iterate() {
         for (int i = 0; i < Integer.parseInt(numOfGens.getText()); i++) {
             generation++;
-            ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation(Double.valueOf(mutationRate.getText()), Integer.parseInt(populationSize.getText()));
+            ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation(Double.valueOf(mutationRate.getText()), Integer.parseInt(populationSize.getText()), fitness);
             updateOverallChart(evolvePopulation);
             updateEliteChart(evolvePopulation);
         }
@@ -110,7 +113,7 @@ public class FXMLDocumentController implements Initializable {
     public void updateOverallChart(ArrayList<MetaModel> evolvePopulation) {
         double overallFitness = 0;
         for (MetaModel model : evolvePopulation) {
-            overallFitness += model.getFitness().getOverallFitness();
+            overallFitness += fitness.getOverallFitness(model);
         }
         overallFitnessSeries.getData().add(new XYChart.Data<>(generation, overallFitness));
     }
@@ -125,9 +128,9 @@ public class FXMLDocumentController implements Initializable {
                //     + "Coupling" + model.getFitness().getCouplingBetweenObjectClasses()
               //      + "Methods\nDistribution" + model.getFitness().getWeightedMethodsPerClass());
 
-            series.getData().add(new XYChart.Data<>("Cohesion", model.getFitness().getCohesionBetweenObjectClasses()));
-            series.getData().add(new XYChart.Data<>("Coupling", model.getFitness().getCouplingBetweenObjectClasses()));
-            series.getData().add(new XYChart.Data<>("Methods\nDistribution", model.getFitness().getWeightedMethodsPerClass()));
+            series.getData().add(new XYChart.Data<>("Cohesion", fitness.cohesionBetweenObjectClasses(model)));
+            series.getData().add(new XYChart.Data<>("Coupling", fitness.couplingBetweenObjectClasses(model)));
+            series.getData().add(new XYChart.Data<>("Methods\nDistribution", fitness.weightedMethodsPerClass(model)));
             observableList.add(series);
             eliteFitnessChart.setData(observableList);
 
@@ -149,7 +152,8 @@ public class FXMLDocumentController implements Initializable {
             MetaModel model = parser.extractModelFromXMI(file);
             original = model;
             overallFitnessChart.getData().clear();
-            evolution = new EvolutionController();
+            fitness = new FitnessMetrics();
+            evolution = new GeneticAlgorithm();
             patterns = new DesignPatternsController();
             viewer = new ModelViewer();
             generateButton.setText("Generate Population");
@@ -182,9 +186,9 @@ public class FXMLDocumentController implements Initializable {
             // fitness chart view
             ObservableList<XYChart.Series<String, Number>> observableList = FXCollections.observableArrayList();
             XYChart.Series<String, Number> series = new XYChart.Series();
-            series.getData().add(new XYChart.Data<>("Cohesion", model.getFitness().getCohesionBetweenObjectClasses()));
-            series.getData().add(new XYChart.Data<>("Coupling", model.getFitness().getCouplingBetweenObjectClasses()));
-            series.getData().add(new XYChart.Data<>("Methods\nDistribution", model.getFitness().getWeightedMethodsPerClass()));
+            series.getData().add(new XYChart.Data<>("Cohesion", fitness.cohesionBetweenObjectClasses(model)));
+            series.getData().add(new XYChart.Data<>("Coupling", fitness.couplingBetweenObjectClasses(model)));
+            series.getData().add(new XYChart.Data<>("Methods\nDistribution", fitness.weightedMethodsPerClass(model)));
             observableList.add(series);
             CategoryAxis xAxis = new CategoryAxis();
             NumberAxis yAxis = new NumberAxis();
@@ -194,9 +198,9 @@ public class FXMLDocumentController implements Initializable {
             AreaChart<String, Number> fitnessChart = new AreaChart(xAxis, yAxis, observableList);
 
             // actual measurements for fitness
-            Label cohesion = new Label("cohesion /" + model.getFitness().getCohesionBetweenObjectClasses());
-            Label coupling = new Label("coupling /" + model.getFitness().getCouplingBetweenObjectClasses());
-            Label WMPC = new Label("WMPC /" + model.getFitness().getWeightedMethodsPerClass());
+            Label cohesion = new Label("cohesion /" +  fitness.cohesionBetweenObjectClasses(model));
+            Label coupling = new Label("coupling /" +  fitness.couplingBetweenObjectClasses(model));
+            Label WMPC = new Label("WMPC /" + fitness.weightedMethodsPerClass(model));
 
             // render the scene
             HBox hBox = new HBox(10);
@@ -221,7 +225,7 @@ public class FXMLDocumentController implements Initializable {
         updateOverallChart(add);
         updateEliteChart(add);
         parser = new ParserController();
-        evolution = new EvolutionController();
+        evolution = new GeneticAlgorithm();
         patterns = new DesignPatternsController();
         viewer = new ModelViewer();
         generateButton.setText("Generate Population");

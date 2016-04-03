@@ -71,6 +71,7 @@ public class XMI_Parser extends Parser {
 
             model.setComponents(extractComponents());
             model.setAssociations(extractAssocations());
+         
             return model;
         } catch (XPathExpressionException ex) {
             Logger.getLogger(XMI_Parser.class.getName()).log(Level.SEVERE, null, ex);

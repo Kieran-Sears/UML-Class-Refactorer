@@ -11,7 +11,6 @@ import DataTypes.Class.Operation;
 import DataTypes.Class.Parameter;
 import DataTypes.CoreComponent;
 import Evolution.MetaModel;
-import Evolution.RelationshipMatrix;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -64,8 +63,8 @@ public class ModelViewer {
 
             }
 
-            String jointjsClassesScript = generateClassesData(classMethodsMap, classAttributesMap, classesPresent, model.getDependencies());
-            String jointjsCouplingScript = getCouplingData(model.getDependencies(), classesPresent);
+            String jointjsClassesScript = generateClassesData(classMethodsMap, classAttributesMap, classesPresent, model);
+            String jointjsCouplingScript = getCouplingData(model, classesPresent);
             return generateHTMLView(jointjsClassesScript, jointjsCouplingScript);
         }
         System.out.println("Error : no components for Model");
@@ -74,7 +73,7 @@ public class ModelViewer {
 
     public String generateClassesData(HashMap<DataTypes.Class.Class, ArrayList<DataTypes.Class.Operation>> classMethodsMap,
             HashMap<DataTypes.Class.Class, ArrayList<DataTypes.Class.Attribute>> classAttributesMap,
-            ArrayList<DataTypes.Class.Class> classesPresent, RelationshipMatrix matrix) {
+            ArrayList<DataTypes.Class.Class> classesPresent, MetaModel model) {
 
         String jointjsClassesScript = "";
         double xpos = 0, ypos = 0, height = 0;
@@ -130,10 +129,10 @@ public class ModelViewer {
                     while (iterator.hasNext()) {
                         Parameter next = iterator.next();
                         if (iterator.hasNext()){
-                       textToAdd += matrix.ReverseLookupClass( matrix.lookupClass(next.getType())) + ", ";
+                       textToAdd += model.reverseLookupTable.get(model.lookupTable.get(next.getType())) + ", ";
                         }
                         else {
-                         textToAdd += matrix.ReverseLookupClass( matrix.lookupClass(next.getType()));
+                         textToAdd += model.reverseLookupTable.get(model.lookupTable.get(next.getType()));
                         }
                             
                     }
@@ -155,13 +154,13 @@ public class ModelViewer {
         return jointjsClassesScript;
     }
 
-    public String getCouplingData(RelationshipMatrix matrix, ArrayList<DataTypes.Class.Class> classesPresent) {
+    public String getCouplingData(MetaModel model, ArrayList<DataTypes.Class.Class> classesPresent) {
 
         String jointjsCouplingScript = "";
         HashMap<Integer, String> classNames = new HashMap();
-        int[][] associationMatrix = matrix.getAssociationMatrix();
-        for (int i = 0; i < associationMatrix.length; i++) {
-            String ReverseLookupClass = matrix.ReverseLookupClass(i);
+      
+        for (int i = 0; i < model.associationMatrix.length; i++) {
+            String ReverseLookupClass = model.reverseLookupTable.get(i);
             for (DataTypes.Class.Class classe : classesPresent) {
                 if (ReverseLookupClass.equalsIgnoreCase(classe.getName())) {
                     classNames.put(i, classe.getName());
@@ -169,10 +168,10 @@ public class ModelViewer {
             }
         }
 
-        for (int i = 0; i < associationMatrix.length; i++) {
-            int[] row = associationMatrix[i];
+        for (int i = 0; i < model.associationMatrix.length; i++) {
+            int[] row = model.associationMatrix[i];
             for (int j = 0; j < row.length; j++) {
-                if (i != j && associationMatrix[i][j] != 0) {
+                if (i != j && model.associationMatrix[i][j] != 0) {
                     jointjsCouplingScript = jointjsCouplingScript
                             + "new joint.dia.Link({ source: { id: classes."
                             + classNames.get(i) + ".id }, target: { id: classes."

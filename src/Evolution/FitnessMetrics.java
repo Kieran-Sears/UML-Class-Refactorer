@@ -21,29 +21,15 @@ import org.apache.commons.math3.distribution.ChiSquaredDistribution;
  */
 public class FitnessMetrics {
 
-   private RelationshipMatrix dependencies;
-   private ArrayList<CoreComponent> components;
-    private double couplingBetweenObjectClasses;
-  private  double cohesionBetweenObjectClasses;
-  private  double weightedMethodsPerClass;
-    // double distanceFromMainSequence;
 
-    public FitnessMetrics(RelationshipMatrix dependencies, ArrayList<CoreComponent> components) {
-        this.dependencies = dependencies;
-        this.components = components;
-        couplingBetweenObjectClasses = couplingBetweenObjectClasses();
-        cohesionBetweenObjectClasses = cohesionBetweenObjectClasses();
-        weightedMethodsPerClass = weightedMethodsPerClass();
-    }
-
-    private double cohesionBetweenObjectClasses() {
+    public double cohesionBetweenObjectClasses(MetaModel model) {
 
         double internals = 0;
         double externals = 0;
         double numOfClasses = 0;
         Class classe = null;
         // go through components
-        for (Component component : components) {
+        for (Component component : model.getComponents()) {
             // isolate the current class
             if (component instanceof DataTypes.Class.Class) {
                 numOfClasses++;
@@ -56,7 +42,7 @@ public class FitnessMetrics {
                 // cycle through operation's parameters
                 for (Parameter parameter : parameters) {
                     String attributeName = null;
-                    for (CoreComponent comp : components) {
+                    for (CoreComponent comp : model.getComponents()) {
                         if (comp.getID().equalsIgnoreCase(parameter.getType())) {
                             attributeName = comp.getName();
                         }
@@ -66,10 +52,10 @@ public class FitnessMetrics {
                     int i = 0;
                     DataTypes.Class.Class class2 = null;
                     while (i != -1) {
-                        if (i >= components.size()) {
+                        if (i >= model.getComponents().size()) {
                             i = -1;
                         } else {
-                            CoreComponent get = components.get(i);
+                            CoreComponent get =model.getComponents().get(i);
                             if (get instanceof DataTypes.Class.Class) {
                                 class2 = (Class) get;
                             }
@@ -94,18 +80,18 @@ public class FitnessMetrics {
         }
     }
 
-    private double couplingBetweenObjectClasses() {
+    public double couplingBetweenObjectClasses(MetaModel model) {
         double runningTotal = 0;
         double numOfClasses = 0;
-        for (Component component : components) {
+        for (Component component : model.getComponents()) {
             if (component instanceof DataTypes.Class.Class) {
                 numOfClasses++;
                 Class classe = (DataTypes.Class.Class) component;
-                Integer classID = dependencies.lookupClass(classe.getID());
-                for (int i = 0; i < dependencies.associationMatrix.length; i++) {
-                    for (int j = 0; j < dependencies.associationMatrix.length; j++) {
+                Integer classID = model.lookupTable.get(classe.getID());
+                for (int i = 0; i < model.associationMatrix.length; i++) {
+                    for (int j = 0; j < model.associationMatrix.length; j++) {
                         if (i == classID && i != j) { //   if ((i == classID || j == classID) && i != j) {
-                            if (dependencies.associationMatrix[i][j] != 0) {   
+                            if (model.associationMatrix[i][j] != 0) {   
                                 runningTotal++;
                             }
                         }
@@ -117,11 +103,11 @@ public class FitnessMetrics {
         return percent;
     }
 
-    private double weightedMethodsPerClass() {
+    public double weightedMethodsPerClass(MetaModel model) {
         int totalOperations = 0;
 
         HashMap<Class, Integer> WMPC = new HashMap();
-        Iterator<CoreComponent> iterator = components.iterator();
+        Iterator<CoreComponent> iterator = model.getComponents().iterator();
         Class classe = null;
 
         while (iterator.hasNext()) {
@@ -157,25 +143,9 @@ public class FitnessMetrics {
         return cumulativeProbability;
     }
 
-    public double getOverallFitness(){
-            return cohesionBetweenObjectClasses + (100 - couplingBetweenObjectClasses) + weightedMethodsPerClass;
+    public double getOverallFitness(MetaModel model){
+            return cohesionBetweenObjectClasses(model) + (100 - couplingBetweenObjectClasses(model)) + weightedMethodsPerClass(model);
     }
     
-    public double getCouplingBetweenObjectClasses() {
-        return couplingBetweenObjectClasses;
-    }
-
-    public double getWeightedMethodsPerClass() {
-        return weightedMethodsPerClass;
-    }
-
-    public double getCohesionBetweenObjectClasses() {
-        return cohesionBetweenObjectClasses;
-    }
-
-    @Override
-    public String toString() {
-        return "FitnessMetrics{" + "couplingBetweenObjectClasses=" + couplingBetweenObjectClasses + ", cohesionBetweenObjectClasses=" + cohesionBetweenObjectClasses + ", weightedMethodsPerClass=" + weightedMethodsPerClass + '}';
-    }
 
 }

@@ -51,8 +51,7 @@ public class GeneticAlgorithm {
             else {
                 newModel.setComponents(components);
             }
-            newModel.setDependencies(model.getDependencies());
-            newModel.updateDependenciesAndFitness();
+            newModel.sortMethodDependencies();
             population.add(newModel);
             
         }
@@ -60,7 +59,7 @@ public class GeneticAlgorithm {
         population.add(model);
     }
 
-    public ArrayList<MetaModel> selection(int populationSize) {
+    public ArrayList<MetaModel> selection(int populationSize, FitnessMetrics fitness) {
         ArrayList<MetaModel> best = new ArrayList();
 //        if (currentBestIndividual == null) {
 //        currentBestIndividual = population.get(0);
@@ -70,7 +69,7 @@ public class GeneticAlgorithm {
         MetaModel chosen = null;
 
         for (MetaModel individual : population) {
-            totalFitness += individual.getFitness().getOverallFitness();
+            totalFitness += fitness.getOverallFitness(individual);
 //            if ( individual.getFitness().getOverallFitness() > currentBestIndividual.getFitness().getOverallFitness()) {
 //            currentBestIndividual = individual;
 //            }
@@ -82,7 +81,7 @@ public class GeneticAlgorithm {
             randNum = (double) (Math.random() * totalFitness);
             chosen = population.get(0);
             for (int j = 0; j < populationSize; j++) {
-                randNum -= population.get(j).getFitness().getOverallFitness();
+                randNum -= fitness.getOverallFitness(population.get(j));
                 if (randNum < 0) {
                     chosen = population.get(i);
                 }
@@ -93,6 +92,30 @@ public class GeneticAlgorithm {
         return best;
     }
 
+     public ArrayList<MetaModel> evolvePopulation(Double mutationRate, int populationSize, FitnessMetrics fitness) {
+   
+            ArrayList<MetaModel> newPopulation = new ArrayList();
+            ArrayList<MetaModel> selection = selection(populationSize, fitness);
+            
+            for (MetaModel model : selection) {
+                MetaModel replacement = new MetaModel();
+                ArrayList<CoreComponent> components = new ArrayList();
+                for (CoreComponent component : model.getComponents()) {
+                    components.add(component);
+                }
+                
+                replacement.setComponents(mutate(components, mutationRate));
+                replacement.sortMethodDependencies();
+                
+               // fitness
+             
+                newPopulation.add(replacement);
+            }
+            population = newPopulation;
+  
+
+        return newPopulation;
+    }
     
     
     
@@ -210,11 +233,9 @@ public class GeneticAlgorithm {
 //        }
 //        return bestIndividuals;
 //    }
-    public MetaModel mutate(MetaModel model, Double mutationRate) {
+    public ArrayList<CoreComponent> mutate(ArrayList<CoreComponent> chromosome, Double mutationRate) {
 
         HashMap<Integer, Integer> indexes = new HashMap();
-        ArrayList<CoreComponent> chromosome = model.getComponents();
-
         for (Component component : chromosome) {
             if (!(component instanceof DataTypes.Class.Class)) {
                 double random = (double) Math.random();
@@ -239,8 +260,8 @@ public class GeneticAlgorithm {
                 chromosome.add(next.getValue(), get);
             }
         }
-        model.setComponents(chromosome);
-        return model;
+  
+        return chromosome;
     }
 
     public MetaModel mutate(MetaModel model, AntiPattern heuristic) {
@@ -251,13 +272,7 @@ public class GeneticAlgorithm {
     // end of evolution operators
     // getters and setters
 
-    public ArrayList<MetaModel> getPopulation() {
-        return population;
-    }
-
-    public void setPopulation(ArrayList<MetaModel> population) {
-        this.population = population;
-    }
+   
 
     
 }
