@@ -8,6 +8,7 @@ package Evolution;
 import DataTypes.Component;
 import DataTypes.CoreComponent;
 import DesignPatterns.AntiPattern;
+import DesignPatterns.AntiPatternAnalyser;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,45 +22,60 @@ import java.util.Random;
 public class GeneticAlgorithm {
 
     private ArrayList<MetaModel> population = new ArrayList();
-   
-  
+    private AntiPatternAnalyser analyser;
     private MetaModel currentBestIndividual;
 
     public void initialiseGA(MetaModel model, int populationSize, Boolean randomized) {
-   
 
         // add random new individuals to the population, randomness is important for initial exploration of search space
         for (int i = 1; i < populationSize; i++) {
-        
-            MetaModel newModel = new MetaModel();
+            MetaModel newModel;
             ArrayList<CoreComponent> components = new ArrayList();
             for (CoreComponent component : model.getComponents()) {
                 components.add(component);
             }
-            if (randomized){
-            ArrayList<CoreComponent> newComponents = new ArrayList();
-            newComponents.add(components.get(0));
-            components.remove(0);
-            Random rand = new Random();
-            while (components.size() > 0) {
-                int index = rand.nextInt(components.size());
-                newComponents.add(components.get(index));
-                components.remove(index);
-            }
-             newModel.setComponents(newComponents);
-            }
-            else {
+            if (randomized) {
+                newModel = generateNewRandomModel(components);
+            } else {
+                newModel = new MetaModel();
                 newModel.setComponents(components);
+                newModel.sortMethodDependencies();
             }
-            newModel.sortMethodDependencies();
             population.add(newModel);
-            
         }
-
         population.add(model);
     }
 
+    public MetaModel generateNewRandomModel(ArrayList<CoreComponent> components) {
+        MetaModel newModel = new MetaModel();
+        ArrayList<CoreComponent> newComponents = new ArrayList();
+        newComponents.add(components.get(0));
+        components.remove(0);
+        Random rand = new Random();
+        while (components.size() > 0) {
+            int index = rand.nextInt(components.size());
+            newComponents.add(components.get(index));
+            components.remove(index);
+        }
+        newModel.setComponents(newComponents);
+        newModel.sortMethodDependencies();
+        return newModel;
+    }
+
     public ArrayList<MetaModel> selection(int populationSize, FitnessMetrics fitness) {
+
+        // adjust population in acordance with the populationSize parameter set by user
+        if (population.size() < populationSize) {
+            for (int i = population.size(); i < populationSize; i++) {
+                MetaModel get = population.get(new Random().nextInt(population.size()));
+                ArrayList<CoreComponent> components = new ArrayList();
+                for (CoreComponent component : get.getComponents()) {
+                    components.add(component);
+                }
+                population.add(generateNewRandomModel(components));
+            }
+        }
+
         ArrayList<MetaModel> best = new ArrayList();
 //        if (currentBestIndividual == null) {
 //        currentBestIndividual = population.get(0);
@@ -76,8 +92,7 @@ public class GeneticAlgorithm {
         }
 
 //        best.add(currentBestIndividual);
-        
-        for (int i = 0; i < populationSize ; i++) { // -number for elite reintroduced members
+        for (int i = 0; i < populationSize; i++) { // -number for elite reintroduced members
             randNum = (double) (Math.random() * totalFitness);
             chosen = population.get(0);
             for (int j = 0; j < populationSize; j++) {
@@ -92,33 +107,39 @@ public class GeneticAlgorithm {
         return best;
     }
 
-     public ArrayList<MetaModel> evolvePopulation(Double mutationRate, int populationSize, FitnessMetrics fitness) {
-   
-            ArrayList<MetaModel> newPopulation = new ArrayList();
-            ArrayList<MetaModel> selection = selection(populationSize, fitness);
-            
-            for (MetaModel model : selection) {
-                MetaModel replacement = new MetaModel();
-                ArrayList<CoreComponent> components = new ArrayList();
-                for (CoreComponent component : model.getComponents()) {
-                    components.add(component);
-                }
-                
-                replacement.setComponents(mutate(components, mutationRate));
-                replacement.sortMethodDependencies();
-                
-               // fitness
-             
-                newPopulation.add(replacement);
+    public ArrayList<MetaModel> evolvePopulation(Double mutationRate, int populationSize, FitnessMetrics fitness, ArrayList<AntiPattern> antiPatterns) {
+
+        ArrayList<MetaModel> newPopulation = new ArrayList();
+        ArrayList<MetaModel> selection = selection(populationSize, fitness);
+
+        for (MetaModel model : selection) {
+            MetaModel replacement = new MetaModel();
+            ArrayList<CoreComponent> components = new ArrayList();
+            for (CoreComponent component : model.getComponents()) {
+                components.add(component);
             }
-            population = newPopulation;
-  
+            if (!antiPatterns.isEmpty()) {
+                ArrayList<CoreComponent> checkedComponents = components;
+                for (AntiPattern antiPattern : antiPatterns) {
+                    analyser = antiPattern;
+                    analyser.scanModel(model);
+                    System.out.println("analysing model for blobs");
+                   checkedComponents = analyser.PerformMutation(checkedComponents);
+                }
+                replacement.setComponents(checkedComponents);
+            } else {
+                replacement.setComponents(mutate(components, mutationRate));
+            }
+            replacement.sortMethodDependencies();
+
+            // fitness
+            newPopulation.add(replacement);
+        }
+        population = newPopulation;
 
         return newPopulation;
     }
-    
-    
-    
+
 //    public ArrayList<MetaModel> selection() {
 //        double randNum;
 //        int remainder = populationSize % 3;
@@ -260,19 +281,11 @@ public class GeneticAlgorithm {
                 chromosome.add(next.getValue(), get);
             }
         }
-  
+
         return chromosome;
     }
 
-    public MetaModel mutate(MetaModel model, AntiPattern heuristic) {
-
-        return model;
-    }
 
     // end of evolution operators
     // getters and setters
-
-   
-
-    
 }

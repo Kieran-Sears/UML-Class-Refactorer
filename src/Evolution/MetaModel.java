@@ -27,17 +27,20 @@ import java.util.logging.Logger;
  */
 public class MetaModel {
 
-  
     // holds all the methods attributes and classes
     private ArrayList<CoreComponent> components;
-    // a list of associations present (composition, aggregation, generalisation etc)
-    private ArrayList<Association> associations;
-
+    private int NumberOfClasses;
+    private int NumberOfAttributes;
+    private int NumberOfOperations;
     public HashMap<Integer, String> reverseLookupTable = new HashMap();
     public HashMap<String, Integer> lookupTable = new HashMap();
     public int[][] associationMatrix;
 
-
+    public MetaModel() {
+        NumberOfClasses = 0;
+        NumberOfAttributes = 0;
+        NumberOfOperations = 0;
+    }
 
     public void sortMethodDependencies() {
 
@@ -64,7 +67,6 @@ public class MetaModel {
             classCounter++;
         }
 
-        System.out.println("/////////////////");
         // add method dependencies
         DataTypes.Class.Class classee = null;
         for (Component component : components) {
@@ -79,21 +81,21 @@ public class MetaModel {
                 for (Parameter parameter : parameters) {
                     // each param that uses another class is a dependency
                     addDependency(classee.getID(), parameter.getType());
-                    System.out.println(classee.getName() + " dependent on " + reverseLookupTable.get(lookupTable.get(parameter.getType())) + " because of " + operation.getName() + " (" + reverseLookupTable.get(lookupTable.get(parameter.getType())) + ")");
+                    //  System.out.println(classee.getName() + " dependent on " + reverseLookupTable.get(lookupTable.get(parameter.getType())) + " because of " + operation.getName() + " (" + reverseLookupTable.get(lookupTable.get(parameter.getType())) + ")");
                 }
             }
             if (component instanceof Attribute) {
                 Attribute attribute = (Attribute) component;
                 if (attribute.getDependency() != null) {
                     addDependency(classee.getID(), attribute.getDependency());
-                    System.out.println(classee.getName() + " dependent on " + reverseLookupTable.get(lookupTable.get(attribute.getDependency())) + " because of " + attribute.getName());
+                    //  System.out.println(classee.getName() + " dependent on " + reverseLookupTable.get(lookupTable.get(attribute.getDependency())) + " because of " + attribute.getName());
                 }
             }
         }
-        System.out.println(this.toString());
+        //  System.out.println(this.toString());
     }
 
-    public ArrayList<CoreComponent> changeAssociationsToAttributes() {
+    public ArrayList<CoreComponent> changeAssociationsToAttributes(ArrayList<Association> associations) {
         // turn aggregations and compositions into dependencies
         for (Association association : associations) {
             // assuming all associations are attribute "collections of objects"
@@ -128,8 +130,6 @@ public class MetaModel {
     }
 
     // getters and setters 
- 
-
     public ArrayList<CoreComponent> getComponents() {
         return components;
     }
@@ -138,12 +138,28 @@ public class MetaModel {
         this.components = components;
     }
 
-    public ArrayList<Association> getAssociations() {
-        return associations;
+    public int getNumberOfClasses() {
+        return NumberOfClasses;
     }
 
-    public void setAssociations(ArrayList<Association> associations) {
-        this.associations = associations;
+    public void incrementClassCount() {
+        this.NumberOfClasses++;
+    }
+
+    public int getNumberOfAttributes() {
+        return NumberOfAttributes;
+    }
+
+    public void incrementAttributeCount() {
+        this.NumberOfAttributes++;
+    }
+
+    public int getNumberOfOperations() {
+        return NumberOfOperations;
+    }
+
+    public void incrementOperationCount() {
+        this.NumberOfOperations++;
     }
 
     // end of getters and setters

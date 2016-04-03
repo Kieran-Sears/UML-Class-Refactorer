@@ -69,41 +69,57 @@ public class XMI_Parser extends Parser {
                 ModelId = idValue.replace(idValue.substring(idValue.lastIndexOf(":")), "");
             }
 
-            model.setComponents(extractComponents());
-            model.setAssociations(extractAssocations());
-         
+            ArrayList<CoreComponent> componentArray = new ArrayList();
+            try {
+                expr = xpath.compile("//packagedElement[@xmi:type='uml:Class']");
+                NodeList classes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+                for (int i = 0; i < classes.getLength(); i++) {
+                    NamedNodeMap attributes = classes.item(i).getAttributes();
+                    Class _class = new Class();
+                    _class.setID(attributes.getNamedItem("xmi:id").getNodeValue());
+                    _class.setIsAbstract(Boolean.parseBoolean(attributes.getNamedItem("isAbstract").getNodeValue()));
+                    _class.setName(attributes.getNamedItem("name").getNodeValue());
+                    model.incrementClassCount();
+                    componentArray.add(_class);
+                    ArrayList<Operation> classOperations = getOperations(attributes.getNamedItem("xmi:id").getNodeValue());
+                    for (Operation operation : classOperations) {
+                        model.incrementOperationCount();
+                        componentArray.add(operation);
+                    }
+                    ArrayList<Attribute> classAttributes = getAttributes(attributes.getNamedItem("xmi:id").getNodeValue());
+                    for (Attribute attribute : classAttributes) {
+                        model.incrementAttributeCount();
+                        componentArray.add(attribute);
+                    }
+                }
+            } catch (XPathExpressionException ex) {
+                Logger.getLogger(XMI_Parser.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            model.setComponents(componentArray);
+
+            ArrayList<Association> classAssociations = new ArrayList();
+            expr = xpath.compile("//packagedElement[@xmi:type='uml:Association']");
+            NodeList assocations = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+            for (int i = 0; i < assocations.getLength(); i++) {
+                //<packagedElement isAbstract="false" isDerived="false" isLeaf="false" memberEnd="gEOpX0qGAqAABgcs wEOpX0qGAqAABgcv" xmi:id="f4OpX0qGAqAABgcq" xmi:type="uml:Association">
+                NamedNodeMap attributes = assocations.item(i).getAttributes();
+                Association association = new Association();
+                model.incrementAttributeCount();
+                association.setID(attributes.getNamedItem("xmi:id").getNodeValue());
+                String[] split = attributes.getNamedItem("memberEnd").getNodeValue().split(" ");
+                association.setSource((String) xpath.compile("(//*[@xmi:id='" + split[0] + "']/@type)[1]").evaluate(doc, XPathConstants.STRING));
+                association.setTarget((String) xpath.compile("(//*[@xmi:id='" + split[1] + "']/@type)[1]").evaluate(doc, XPathConstants.STRING));
+                classAssociations.add(association);
+            }
+
+            model.changeAssociationsToAttributes(classAssociations);
+
             return model;
         } catch (XPathExpressionException ex) {
             Logger.getLogger(XMI_Parser.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
-    }
-
-    public ArrayList<CoreComponent> extractComponents() {
-        ArrayList<CoreComponent> componentArray = new ArrayList();
-        try {
-            expr = xpath.compile("//packagedElement[@xmi:type='uml:Class']");
-            NodeList classes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-            for (int i = 0; i < classes.getLength(); i++) {
-                NamedNodeMap attributes = classes.item(i).getAttributes();
-                Class _class = new Class();
-                _class.setID(attributes.getNamedItem("xmi:id").getNodeValue());
-                _class.setIsAbstract(Boolean.parseBoolean(attributes.getNamedItem("isAbstract").getNodeValue()));
-                _class.setName(attributes.getNamedItem("name").getNodeValue());
-                componentArray.add(_class);
-                ArrayList<Operation> classOperations = getOperations(attributes.getNamedItem("xmi:id").getNodeValue());
-                for (Operation operation : classOperations) {
-                    componentArray.add(operation);
-                }
-                ArrayList<Attribute> classAttributes = getAttributes(attributes.getNamedItem("xmi:id").getNodeValue());
-                for (Attribute attribute : classAttributes) {
-                    componentArray.add(attribute);
-                }
-            }
-        } catch (XPathExpressionException ex) {
-            Logger.getLogger(XMI_Parser.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return componentArray;
     }
 
     public ArrayList<Attribute> getAttributes(String className) throws XPathExpressionException {
@@ -161,20 +177,4 @@ public class XMI_Parser extends Parser {
         return parameterArray;
     }
 
-    public ArrayList<Association> extractAssocations() throws XPathExpressionException {
-        ArrayList<Association> classAssociations = new ArrayList();
-        expr = xpath.compile("//packagedElement[@xmi:type='uml:Association']");
-        NodeList assocations = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-        for (int i = 0; i < assocations.getLength(); i++) {
-            //<packagedElement isAbstract="false" isDerived="false" isLeaf="false" memberEnd="gEOpX0qGAqAABgcs wEOpX0qGAqAABgcv" xmi:id="f4OpX0qGAqAABgcq" xmi:type="uml:Association">
-            NamedNodeMap attributes = assocations.item(i).getAttributes();
-            Association association = new Association();
-            association.setID(attributes.getNamedItem("xmi:id").getNodeValue());
-            String[] split = attributes.getNamedItem("memberEnd").getNodeValue().split(" ");
-            association.setSource((String) xpath.compile("(//*[@xmi:id='" + split[0] + "']/@type)[1]").evaluate(doc, XPathConstants.STRING));
-            association.setTarget((String) xpath.compile("(//*[@xmi:id='" + split[1] + "']/@type)[1]").evaluate(doc, XPathConstants.STRING));
-            classAssociations.add(association);
-        }
-        return classAssociations;
-    }
 }

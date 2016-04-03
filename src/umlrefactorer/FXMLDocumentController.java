@@ -5,6 +5,8 @@
  */
 package umlrefactorer;
 
+import DesignPatterns.AntiPattern;
+import DesignPatterns.Blob;
 import Evolution.FitnessMetrics;
 import Evolution.GeneticAlgorithm;
 import Evolution.MetaModel;
@@ -14,6 +16,8 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -29,6 +33,8 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -52,6 +58,8 @@ public class FXMLDocumentController implements Initializable {
     ModelViewer viewer;
     int generation = 0;
     MetaModel original;
+    ObservableList<String> antiPatternSelectionList = FXCollections.observableArrayList();
+    ArrayList<AntiPattern> antiPatterns = new ArrayList();
     ObservableList<XYChart.Series<Number, Number>> overallFitnessList = FXCollections.observableArrayList();
     XYChart.Series<Number, Number> overallFitnessSeries = new XYChart.Series();
 
@@ -67,11 +75,38 @@ public class FXMLDocumentController implements Initializable {
     private TextField numOfGens;
     @FXML
     private TextField mutationRate;
-    @FXML 
+    @FXML
     private CheckBox randomizeInitialization;
+    @FXML
+    private ListView antiPatternSelection;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+         antiPatternSelectionList.add("None");
+        antiPatternSelectionList.add("Blob");
+        antiPatternSelection.setItems(antiPatternSelectionList);
+        antiPatternSelection.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        antiPatternSelection.getSelectionModel().selectFirst();
+        antiPatternSelection.setOnMouseClicked(new EventHandler<Event>() {
+            @Override
+            public void handle(Event event) {
+                antiPatterns.clear();
+                ObservableList<String> selectedItems = antiPatternSelection.getSelectionModel().getSelectedItems();
+                for (String s : selectedItems) {
+                    switch (s) {
+                        case "None":
+                            antiPatternSelection.getSelectionModel().clearAndSelect(0);
+                            break;
+                        case "Blob":
+                            antiPatterns.add(new Blob());
+                            System.out.println("added blob");
+                            break;
+                        default:
+                            throw new AssertionError();
+                    }
+                }
+            }
+        });
         eliteFitnessChart.getYAxis().autoRangingProperty().setValue(false);
         ((NumberAxis) eliteFitnessChart.getYAxis()).setUpperBound(100);
         ((NumberAxis) eliteFitnessChart.getYAxis()).setTickUnit(10);
@@ -103,7 +138,7 @@ public class FXMLDocumentController implements Initializable {
     public void iterate() {
         for (int i = 0; i < Integer.parseInt(numOfGens.getText()); i++) {
             generation++;
-            ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation(Double.valueOf(mutationRate.getText()), Integer.parseInt(populationSize.getText()), fitness);
+            ArrayList<MetaModel> evolvePopulation = evolution.evolvePopulation(Double.valueOf(mutationRate.getText()), Integer.parseInt(populationSize.getText()), fitness, antiPatterns);
             updateOverallChart(evolvePopulation);
             updateEliteChart(evolvePopulation);
         }
@@ -125,8 +160,8 @@ public class FXMLDocumentController implements Initializable {
             XYChart.Series<String, Number> series = new XYChart.Series();
             series.setName(String.valueOf("N." + populationMember));
            // System.out.println("Cohesion" + model.getFitness().getCohesionBetweenObjectClasses()
-               //     + "Coupling" + model.getFitness().getCouplingBetweenObjectClasses()
-              //      + "Methods\nDistribution" + model.getFitness().getWeightedMethodsPerClass());
+            //     + "Coupling" + model.getFitness().getCouplingBetweenObjectClasses()
+            //      + "Methods\nDistribution" + model.getFitness().getWeightedMethodsPerClass());
 
             series.getData().add(new XYChart.Data<>("Cohesion", fitness.cohesionBetweenObjectClasses(model)));
             series.getData().add(new XYChart.Data<>("Coupling", fitness.couplingBetweenObjectClasses(model)));
@@ -198,9 +233,10 @@ public class FXMLDocumentController implements Initializable {
             AreaChart<String, Number> fitnessChart = new AreaChart(xAxis, yAxis, observableList);
 
             // actual measurements for fitness
-            Label cohesion = new Label("cohesion /" +  fitness.cohesionBetweenObjectClasses(model));
-            Label coupling = new Label("coupling /" +  fitness.couplingBetweenObjectClasses(model));
+            Label cohesion = new Label("cohesion /" + fitness.cohesionBetweenObjectClasses(model));
+            Label coupling = new Label("coupling /" + fitness.couplingBetweenObjectClasses(model));
             Label WMPC = new Label("WMPC /" + fitness.weightedMethodsPerClass(model));
+            Label totalfit = new Label("totalFitness /" + fitness.getOverallFitness(model));
 
             // render the scene
             HBox hBox = new HBox(10);
@@ -208,7 +244,7 @@ public class FXMLDocumentController implements Initializable {
             hBox.getChildren().setAll(webview, fitnessChart);
             final VBox vBox = new VBox(5);
             vBox.setAlignment(Pos.CENTER);
-            vBox.getChildren().setAll(hBox, cohesion, coupling, WMPC);
+            vBox.getChildren().setAll(hBox, cohesion, coupling, WMPC, totalfit);
             Scene scene = new Scene(vBox, 1200, 800);
             stage1.setScene(scene);
             stage1.show();

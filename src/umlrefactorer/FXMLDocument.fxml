@@ -38,7 +38,7 @@
                         <AnchorPane id="AnchorPane" prefHeight="628.0" prefWidth="887.0">
                             <children>
                                 <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
-                              <VBox layoutX="16.0" layoutY="14.0" prefHeight="407.0" prefWidth="148.0" spacing="15.0">
+                              <VBox layoutX="16.0" layoutY="14.0" prefHeight="513.0" prefWidth="148.0" spacing="15.0">
                                  <children>
                                       <Button fx:id="generateButton" prefHeight="25.0" prefWidth="147.0" text="Evolve" />
                                     <Label text="Population Size" />
@@ -49,6 +49,7 @@
                                     <TextField fx:id="mutationRate" text="0.05" />
                                     <Button mnemonicParsing="false" onAction="#reset" prefHeight="25.0" prefWidth="147.0" text="Reset" />
                                     <CheckBox fx:id="randomizeInitialization" mnemonicParsing="false" prefHeight="58.0" prefWidth="128.0" text="Randomize model on Initialization" wrapText="true" />
+                                    <ListView fx:id="antiPatternSelection" prefHeight="110.0" prefWidth="148.0" />
                                  </children>
                               </VBox>
                               <LineChart fx:id="overallFitnessChart" layoutX="232.0" layoutY="27.0" prefHeight="607.0" prefWidth="972.0">
