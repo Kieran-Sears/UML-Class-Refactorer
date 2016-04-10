@@ -23,9 +23,10 @@ public class GeneticAlgorithm {
 
     private ArrayList<MetaModel> population = new ArrayList();
     private AntiPatternAnalyser analyser;
-    private MetaModel currentBestIndividual;
+    private MetaModel[] eliteGroup;
 
     public void initialiseGA(MetaModel model, int populationSize, Boolean randomized) {
+        eliteGroup = new MetaModel[10];
         MetaModel newModel = null;
         // add random new individuals to the population, randomness is important for initial exploration of search space
         for (int i = 1; i < populationSize; i++) {
@@ -77,30 +78,43 @@ public class GeneticAlgorithm {
     }
 
     public ArrayList<MetaModel> selection(int populationSize, FitnessMetrics fitness) {
-        // adjust population in acordance with the populationSize parameter set by user
-        if (population.size() < populationSize) {
-            for (int i = population.size(); i < populationSize; i++) {
-               //  population.add(generateNewRandomModel(currentBestIndividual));
-                population.add(generateNewRandomModel(population.get(new Random().nextInt(population.size()))));
+     
+        ArrayList<MetaModel> best = new ArrayList();
+        // check elite group isnt empty
+        for (int i = 0; i < eliteGroup.length; i++) {
+            MetaModel metaModel = eliteGroup[i];
+            if (metaModel == null) {
+                eliteGroup[i] = population.get(0);
             }
         }
 
-        ArrayList<MetaModel> best = new ArrayList();
-//        if (currentBestIndividual == null) {
-//        currentBestIndividual = population.get(0);
-//        }
+        // adjust population in acordance with the populationSize parameter set by user if its been changed
+        if (population.size() < populationSize) {
+            for (int i = population.size(); i < populationSize; i++) {
+                population.add(generateNewRandomModel(eliteGroup[new Random().nextInt(eliteGroup.length)]));
+                //  population.add(generateNewRandomModel(population.get(new Random().nextInt(population.size()))));
+            }
+        }
+
         double randNum;
         double totalFitness = 0;
         MetaModel chosen = null;
 
         for (MetaModel individual : population) {
             totalFitness += fitness.getOverallFitness(individual);
-//            if ( individual.getFitness().getOverallFitness() > currentBestIndividual.getFitness().getOverallFitness()) {
-//            currentBestIndividual = individual;
-//            }
+            for (int i = 0; i < eliteGroup.length; i++) {
+                if (fitness.getOverallFitness(individual) > fitness.getOverallFitness(eliteGroup[i])) {
+                    eliteGroup[i] = individual;
+                    i = eliteGroup.length;
+                }
+            }
         }
 
-//        best.add(currentBestIndividual);
+        for (int i = 0; i < eliteGroup.length; i++) {
+            MetaModel metaModel = eliteGroup[i];
+            best.add(metaModel);
+        }
+
         for (int i = 0; i < populationSize; i++) { // -number for elite reintroduced members
             randNum = (double) (Math.random() * totalFitness);
             chosen = population.get(0);
@@ -112,6 +126,7 @@ public class GeneticAlgorithm {
             }
             best.add(chosen);
         }
+     
         return best;
     }
 
