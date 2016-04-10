@@ -162,6 +162,20 @@ public class MetaModel {
         this.NumberOfOperations++;
     }
 
+    public void setNumberOfClasses(int NumberOfClasses) {
+        this.NumberOfClasses = NumberOfClasses;
+    }
+
+    public void setNumberOfAttributes(int NumberOfAttributes) {
+        this.NumberOfAttributes = NumberOfAttributes;
+    }
+
+    public void setNumberOfOperations(int NumberOfOperations) {
+        this.NumberOfOperations = NumberOfOperations;
+    }
+
+    
+    
     // end of getters and setters
     // Printing results out
     public void outputResultsToFile(File file) {

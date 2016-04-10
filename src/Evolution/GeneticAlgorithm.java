@@ -26,28 +26,39 @@ public class GeneticAlgorithm {
     private MetaModel currentBestIndividual;
 
     public void initialiseGA(MetaModel model, int populationSize, Boolean randomized) {
-
+        MetaModel newModel = null;
         // add random new individuals to the population, randomness is important for initial exploration of search space
         for (int i = 1; i < populationSize; i++) {
-            MetaModel newModel;
-            ArrayList<CoreComponent> components = new ArrayList();
-            for (CoreComponent component : model.getComponents()) {
-                components.add(component);
-            }
             if (randomized) {
-                newModel = generateNewRandomModel(components);
+                newModel = generateNewRandomModel(model);
             } else {
-                newModel = new MetaModel();
-                newModel.setComponents(components);
-                newModel.sortMethodDependencies();
+                newModel = copyModel(model);
             }
             population.add(newModel);
         }
         population.add(model);
     }
 
-    public MetaModel generateNewRandomModel(ArrayList<CoreComponent> components) {
+    public MetaModel copyModel(MetaModel model) {
         MetaModel newModel = new MetaModel();
+        ArrayList<CoreComponent> components = new ArrayList();
+        for (CoreComponent component : model.getComponents()) {
+            components.add(component);
+        }
+        newModel.setComponents(components);
+        newModel.sortMethodDependencies();
+        newModel.setNumberOfAttributes(model.getNumberOfAttributes());
+        newModel.setNumberOfOperations(model.getNumberOfOperations());
+        newModel.setNumberOfClasses(model.getNumberOfClasses());
+        return newModel;
+    }
+
+    public MetaModel generateNewRandomModel(MetaModel model) {
+        MetaModel newModel = new MetaModel();
+        ArrayList<CoreComponent> components = new ArrayList();
+        for (CoreComponent component : model.getComponents()) {
+            components.add(component);
+        }
         ArrayList<CoreComponent> newComponents = new ArrayList();
         newComponents.add(components.get(0));
         components.remove(0);
@@ -59,20 +70,18 @@ public class GeneticAlgorithm {
         }
         newModel.setComponents(newComponents);
         newModel.sortMethodDependencies();
+        newModel.setNumberOfAttributes(model.getNumberOfAttributes());
+        newModel.setNumberOfOperations(model.getNumberOfOperations());
+        newModel.setNumberOfClasses(model.getNumberOfClasses());
         return newModel;
     }
 
     public ArrayList<MetaModel> selection(int populationSize, FitnessMetrics fitness) {
-
         // adjust population in acordance with the populationSize parameter set by user
         if (population.size() < populationSize) {
             for (int i = population.size(); i < populationSize; i++) {
-                MetaModel get = population.get(new Random().nextInt(population.size()));
-                ArrayList<CoreComponent> components = new ArrayList();
-                for (CoreComponent component : get.getComponents()) {
-                    components.add(component);
-                }
-                population.add(generateNewRandomModel(components));
+               //  population.add(generateNewRandomModel(currentBestIndividual));
+                population.add(generateNewRandomModel(population.get(new Random().nextInt(population.size()))));
             }
         }
 
@@ -103,40 +112,30 @@ public class GeneticAlgorithm {
             }
             best.add(chosen);
         }
-
         return best;
     }
 
     public ArrayList<MetaModel> evolvePopulation(Double mutationRate, int populationSize, FitnessMetrics fitness, ArrayList<AntiPattern> antiPatterns) {
-
         ArrayList<MetaModel> newPopulation = new ArrayList();
         ArrayList<MetaModel> selection = selection(populationSize, fitness);
-
+        MetaModel mutatedModel = null;
         for (MetaModel model : selection) {
-            MetaModel replacement = new MetaModel();
-            ArrayList<CoreComponent> components = new ArrayList();
-            for (CoreComponent component : model.getComponents()) {
-                components.add(component);
-            }
             if (!antiPatterns.isEmpty()) {
-                ArrayList<CoreComponent> checkedComponents = components;
                 for (AntiPattern antiPattern : antiPatterns) {
                     analyser = antiPattern;
-                    analyser.scanModel(model);
-                    System.out.println("analysing model for blobs");
-                   checkedComponents = analyser.PerformMutation(checkedComponents);
+                    boolean scanModel = analyser.scanModel(model);
+                    if (scanModel) {
+                        mutatedModel = analyser.PerformMutation(model);
+                    } else {
+                        mutatedModel = mutate(model, mutationRate);
+                    }
                 }
-                replacement.setComponents(checkedComponents);
             } else {
-                replacement.setComponents(mutate(components, mutationRate));
+                mutatedModel = mutate(model, mutationRate);
             }
-            replacement.sortMethodDependencies();
-
-            // fitness
-            newPopulation.add(replacement);
+            newPopulation.add(mutatedModel);
         }
         population = newPopulation;
-
         return newPopulation;
     }
 
@@ -254,17 +253,23 @@ public class GeneticAlgorithm {
 //        }
 //        return bestIndividuals;
 //    }
-    public ArrayList<CoreComponent> mutate(ArrayList<CoreComponent> chromosome, Double mutationRate) {
+    public MetaModel mutate(MetaModel model, Double mutationRate) {
+
+        MetaModel replacement = new MetaModel();
+        ArrayList<CoreComponent> components = new ArrayList();
+        for (CoreComponent component : model.getComponents()) {
+            components.add(component);
+        }
 
         HashMap<Integer, Integer> indexes = new HashMap();
-        for (Component component : chromosome) {
+        for (Component component : components) {
             if (!(component instanceof DataTypes.Class.Class)) {
                 double random = (double) Math.random();
                 if (random <= mutationRate) {
-                    int indexOf = chromosome.indexOf(component);
-                    int replacementIndex = 1 + (int) (Math.random() * chromosome.size() - 1);
+                    int indexOf = components.indexOf(component);
+                    int replacementIndex = 1 + (int) (Math.random() * components.size() - 1);
                     while (replacementIndex == indexOf) {
-                        replacementIndex = 1 + (int) (Math.random() * chromosome.size() - 1);
+                        replacementIndex = 1 + (int) (Math.random() * components.size() - 1);
                     }
                     indexes.put(indexOf, replacementIndex);
                 }
@@ -273,18 +278,22 @@ public class GeneticAlgorithm {
         Iterator<Map.Entry<Integer, Integer>> iterator = indexes.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Integer, Integer> next = iterator.next();
-            CoreComponent get = chromosome.get(next.getKey());
-            chromosome.remove(get);
+            CoreComponent get = components.get(next.getKey());
+            components.remove(get);
             if (next.getKey() < next.getValue()) {
-                chromosome.add(next.getValue() - 1, get);
+                components.add(next.getValue() - 1, get);
             } else {
-                chromosome.add(next.getValue(), get);
+                components.add(next.getValue(), get);
             }
         }
 
-        return chromosome;
+        replacement.setComponents(components);
+        replacement.sortMethodDependencies();
+        replacement.setNumberOfAttributes(model.getNumberOfAttributes());
+        replacement.setNumberOfOperations(model.getNumberOfOperations());
+        replacement.setNumberOfClasses(model.getNumberOfClasses());
+        return replacement;
     }
-
 
     // end of evolution operators
     // getters and setters
